@@ -138,7 +138,17 @@ class Application(tk.Frame):
 
     def parallelProj(self, h):
         H = h
-        print(len(H))
+
+        VRP = ([self.vrpx.get(), self.vrpy.get(), self.vrpz.get()])
+        VPN = ([self.vpnx.get(), self.vpny.get(), self.vpnz.get()])
+        VUP = ([self.vupx.get(), self.vupy.get(), self.vupz.get()])
+        COP = ([self.copx.get(), self.copy.get(), self.copz.get()])
+        umin = self.umin.get()
+        vmin = self.vmin.get()
+        umax = self.umax.get()
+        vmax = self.vmax.get()
+        fp = self.fp.get()
+        bp = self.bp.get()
 
         A = ([ux, vx, Nx, 0],
              [uy, vy, Ny, 0],
