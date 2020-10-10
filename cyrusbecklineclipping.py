@@ -156,7 +156,7 @@ def cyrusbeck(P1, P2, V, E, S):
                 print('trivially accepted' + ' f: ' + str(f) + ' f2: ' + str(f2))
             elif(f < 0 and f2 < 0):
                 print('trivially rejected' + ' f: ' + str(f) + ' f2: ' + str(f2))
-                print(ep1, ep2)
+                # print(ep1, ep2)
             else:
                 print('perform clipping' + ' f: ' + str(f) + ' f2: ' + str(f2))
 
@@ -165,11 +165,11 @@ def cyrusbeck(P1, P2, V, E, S):
 
                     t = findt(A, B, P, N)
 
-                    print('t found at: ' + str(t))
+                    # print('t found at: ' + str(t))
                     entering.append(t)
 
                     C = parametriclineequation(A, B, t)
-                    print('entering ' + str(C))
+                    # print('entering ' + str(C))
                     # if(N[0] != 0):
                     #     C = (A[0], C[1] )
                     # elif(N[1] != 0):
@@ -188,11 +188,11 @@ def cyrusbeck(P1, P2, V, E, S):
 
                     t = np.matmul(AP, N) / np.matmul(AB, N)
 
-                    print('t found at: ' + str(t))
+                    # print('t found at: ' + str(t))
                     leaving.append(t)
 
                     C = parametriclineequation(A, B, t)
-                    print('leaving ' + str(C))
+                    # print('leaving ' + str(C))
                     # if(N[0] != 0):
                     #     C = (B[0], C[1])
                     # elif(N[1] != 0):
@@ -224,27 +224,29 @@ def cyrusbeck(P1, P2, V, E, S):
 
         if(te <= tl):
             print('AB accepted')
-            print('A = ' + str(P1))
-            print('B = ' + str(P2))
-            print('A prime = ' + str(A))
-            print('B prime = ' + str(B))
+            # print('A = ' + str(P1))
+            # print('B = ' + str(P2))
+            # print('A prime = ' + str(A))
+            # print('B prime = ' + str(B))
             res.append((A, B))
         elif(te > tl):
             print('AB rejected')
-            print('te: ' + str(te) + ' tl: ' + str(tl))
+            # print('te: ' + str(te) + ' tl: ' + str(tl))
         else:
             print('AB accepted no clipping')
 
     
     frontres = res[0]
-    print('xy', frontres)
+    # print('xy', frontres)
     topres = res[1]
-    print('xz-', topres)
+    # print('xz-', topres)
     leftres = res[2]
-    print('zy', leftres)
+    # print('zy', leftres)
     P1res = (topres[0][0], leftres[0][1], -topres[0][1])
-    print('P1 prime:', P1res)
+    # print('P1 prime:', P1res)
     P2res = (topres[1][0], frontres[1][1], -topres[1][1])
-    print('P2 prime:', P2res)
+    # print('P2 prime:', P2res)
+
+    return P1res, P2res
 
 cyrusbeck(P1, P2, V, edges, surfaces)

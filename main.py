@@ -2,6 +2,7 @@ import tkinter as tk
 import classes as cs
 import numpy as np
 import math
+import cyrusbecklineclipping as cb
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -137,8 +138,8 @@ class Application(tk.Frame):
 
         return H
 
-    def parallelProj(self, h):
-        H = h
+    def parallelProj(self):
+        H = self.theboringhouse()
 
         VRP = ([float(self.vrpx.get()), float(self.vrpy.get()), float(self.vrpz.get())])
         VPN = ([float(self.vpnx.get()), float(self.vpny.get()), float(self.vpnz.get())])
@@ -224,23 +225,122 @@ class Application(tk.Frame):
             P5 = (res[0], res[1], res[2])
             H5.append(P5)
 
-        VP5 = COPz / (B - COPz)
-        
+                
         # T6 clipping not yet implemented
 
+        Hedges = []
+        Hedges.append((H5[0], H5[1]))
+        Hedges.append((H5[1], H5[2]))
+        Hedges.append((H5[2], H5[3]))
+        Hedges.append((H5[3], H5[4]))
+        Hedges.append((H5[4], H5[0]))
+        
+        Hedges.append((H5[5], H5[6]))
+        Hedges.append((H5[6], H5[7]))
+        Hedges.append((H5[7], H5[8]))
+        Hedges.append((H5[8], H5[9]))
+        Hedges.append((H5[9], H5[5]))
+
+        Hedges.append((H5[0], H5[5]))
+        Hedges.append((H5[1], H5[6]))
+        Hedges.append((H5[2], H5[7]))
+        Hedges.append((H5[3], H5[8]))
+        Hedges.append((H5[4], H5[9]))
+
+        V = []
+        V.append((umin, vmax, F))
+        V.append((umax, vmax, F))
+        V.append((umax, vmin, F))
+        V.append((umin, vmin, F))
+        V.append((umin, vmax, B))
+        V.append((umax, vmax, B))
+        V.append((umax, vmin, B))
+        V.append((umin, vmin, B))
+
+        edges = []
+        edges.append((V[0], V[1])) # edge 0
+        edges.append((V[1], V[2])) # edge 1
+        edges.append((V[2], V[3])) # edge 2
+        edges.append((V[3], V[0])) # edge 3
+
+        edges.append((V[4], V[5])) # edge 4
+        edges.append((V[5], V[6])) # edge 5
+        edges.append((V[6], V[7])) # edge 6
+        edges.append((V[7], V[4])) # edge 7
+
+        edges.append((V[0], V[4])) # edge 8
+        edges.append((V[1], V[5])) # edge 9
+        edges.append((V[2], V[6])) # edge 10
+        edges.append((V[3], V[7])) # edge 11
+
+        surfaces = []
+        surfaces.append((edges[0], edges[1], edges[2], edges[3])) # front
+        surfaces.append((edges[4], edges[5], edges[6], edges[7])) # back
+        surfaces.append((edges[4], (V[5], V[1]), (V[1], V[0]), edges[8])) # top
+        surfaces.append(((V[7], V[6]), (V[6], V[2]), edges[2], edges[11])) # bottom
+        surfaces.append(((V[4], V[0]), (V[0], V[3]), edges[11], edges[7])) # left
+        surfaces.append(((V[5], V[1]), edges[1], edges[10], (V[6], V[5]))) # right
+
+        tmp = []
+        H6 = []
+        for i in range(len(Hedges)):
+            housedge = Hedges[i]
+            res = cb.cyrusbeck(housedge[0], housedge[1], V, edges, surfaces)
+            tmp.append(res)
+            if(i < 10):
+                H6.append(res[0])
+
+        
+        VP5 = COPz / (B - COPz)
         T7 = ([0, 0, -VP5])
 
+        H7 = []
+        for i in range(len(H6)):
+            P = H6[i]
+            res = cs.Translate(P, T7)
+            P7 = (res[0], res[1], res[2])
+            H7.append(P7)
 
+        T8 = ([(COPz - B) / COPz, 0, 0, 0],
+              [0, (COPz - B) / COPz, 0, 0],
+              [0, 0, 1, 0],
+              [0, 0, 0, 1])
+        
+        H8 = []
 
+        for i in range(len(H7)):
+            P = H7[i]
+            Pv = ([P[0], P[1], P[2], 1])
+            res = np.matmul(Pv, T8)
+            P8 = (res[0], res[1], res[2])
+            H8.append(P8)
 
+        COPz8 = COPz / (COPz - B)
+        T9 = ([1, 0, 0, 0],
+              [0, 1, 0, 0],
+              [0, 0, 1, -(1 / COPz8)],
+              [0, 0, 0, 1])
+        
+        H9 = []
 
+        for i in range(len(H8)):
+            P = H8[i]
+            Pv = ([P[0], P[1], P[2], 1])
+            res = np.matmul(Pv, T9)
+            P9 = (res[0], res[1], res[2])
+            H9.append(P9)
 
-    
+        print('\n')
+        for p in H9:
+            print(p)
+
+        # tinggal gambar di canvas
+        
+
     def refreshView(self):
         print("refresh!")
-        H = self.theboringhouse()
-
-        self.parallelProj(H)
+        
+        self.parallelProj()
 
 
     
