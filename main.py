@@ -154,7 +154,7 @@ class Application(tk.Frame):
         VPN_mag = math.sqrt(math.pow(VPN[0], 2) + math.pow(VPN[1], 2) + math.pow(VPN[2], 2))
         N = np.divide(VPN, VPN_mag)
 
-        VUP_mag = math.sqrtmath.pow(VUP[0], 2) + math.pow(VUP[1], 2) + math.pow(VUP[2], 2))
+        VUP_mag = math.sqrt(math.pow(VUP[0], 2) + math.pow(VUP[1], 2) + math.pow(VUP[2], 2))
         up = np.divide(VUP, VUP_mag)
 
         upp = np.subtract(up, np.multiply(N, np.dot(up, N)))
