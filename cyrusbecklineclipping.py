@@ -14,29 +14,29 @@ V.append((absval, -absval, -absval))
 V.append((-absval, -absval, -absval))
 
 edges = []
-edges.append((V[0], V[1]))
-edges.append((V[1], V[2]))
-edges.append((V[2], V[3]))
-edges.append((V[3], V[0]))
+edges.append((V[0], V[1])) # edge 0
+edges.append((V[1], V[2])) # edge 1
+edges.append((V[2], V[3])) # edge 2
+edges.append((V[3], V[0])) # edge 3
 
-edges.append((V[4], V[5]))
-edges.append((V[5], V[6]))
-edges.append((V[6], V[7]))
-edges.append((V[7], V[4]))
+edges.append((V[4], V[5])) # edge 4
+edges.append((V[5], V[6])) # edge 5
+edges.append((V[6], V[7])) # edge 6
+edges.append((V[7], V[4])) # edge 7
 
-edges.append((V[0], V[4]))
-edges.append((V[1], V[5]))
-edges.append((V[2], V[6]))
-edges.append((V[3], V[7]))
+edges.append((V[0], V[4])) # edge 8
+edges.append((V[1], V[5])) # edge 9
+edges.append((V[2], V[6])) # edge 10
+edges.append((V[3], V[7])) # edge 11
 
 surfaces = []
 # ikutin urutan edges ini
 surfaces.append((edges[0], edges[1], edges[2], edges[3])) # front
 surfaces.append((edges[4], edges[5], edges[6], edges[7])) # back
-surfaces.append(((edges[8]), edges[4], (V[5], V[1]), (V[1], V[0]))) # top
-surfaces.append((edges[11], (V[7], V[6]), (V[6], V[2]), edges[2])) # bottom
-surfaces.append((edges[7], (V[4], V[0]), (V[0], V[3]), edges[11])) # left
-surfaces.append(((V[2], V[1]), edges[10], edges[6], (V[6], V[2]))) # right
+surfaces.append((edges[4], (V[5], V[1]), (V[1], V[0]), edges[8])) # top
+surfaces.append(((V[7], V[6]), (V[6], V[2]), edges[2], edges[11])) # bottom
+surfaces.append(((V[4], V[0]), (V[0], V[3]), edges[11], edges[7])) # left
+surfaces.append(((V[5], V[1]), edges[1], edges[10], (V[6], V[5]))) # right
 
 # Line yg mau di clip
 P1 = (-3, -3, 3)
@@ -67,6 +67,8 @@ def cyrusbeck(P1, P2, V, E, S):
     # S is the surfaces of the object
     # urutan surface = front, back, top, bottom, left, right (dilihat dari z+)
 
+    res = []
+
     for s in range(len(S)):
         surfaceedges = S[s]
 
@@ -80,23 +82,58 @@ def cyrusbeck(P1, P2, V, E, S):
 
         print('\nsurface: ' + surfacedict[s])
 
-        if(s == 0 or s == 1):
+        if(s == 0):
+            # front (x, y)
             A = ([P1[0], P1[1]])
             B = ([P2[0], P2[1]])
-        elif(s == 2 or s == 3): 
-            A = ([P1[0], P1[2]])
-            B = ([P2[0], P2[2]])
-        elif(s == 4 or s == 5):
+        elif(s == 1):
+            # back the same as front
+            continue
+        elif(s == 2): 
+            # top (x, z)
+            A = ([P1[0], -P1[2]])
+            B = ([P2[0], -P2[2]])
+        elif(s == 3):
+            # bottom same as top
+            continue
+        elif(s == 4):
+            # left (z, y)
             A = ([P1[2], P1[1]])
             B = ([P2[2], P2[1]])
+        elif(s == 5):
+            # right same as left
+            continue
+
         
 
         for i in range(len(surfaceedges)):
             e = surfaceedges[i]
             ep1 = e[0]
-            ep1 = (ep1[0], ep1[1])
             ep2 = e[1]
-            ep2 = (ep2[0], ep2[1])
+
+            if(s == 0):
+                # front (x, y)
+                ep1 = (ep1[0], ep1[1])
+                ep2 = (ep2[0], ep2[1])
+            elif(s == 1):
+                # back the same as front
+                continue
+            elif(s == 2): 
+                # top (x, z)
+                ep1 = (ep1[0], -ep1[2])
+                ep2 = (ep2[0], -ep2[2])
+            elif(s == 3):
+                # bottom same as top
+                continue
+            elif(s == 4):
+                # left (z, y)
+                ep1 = (ep1[2], ep1[1])
+                ep2 = (ep2[2], ep2[1])
+            elif(s == 5):
+                # right same as left
+                continue
+            
+
             dy = ep2[1] - ep1[1]
             dx = ep2[0] - ep1[0]
 
@@ -105,37 +142,38 @@ def cyrusbeck(P1, P2, V, E, S):
 
             P = ep2
 
-            f = np.matmul(np.subtract(A, ep1), N)
+            f = np.matmul(np.subtract(A, P), N)
             # if(f > 0): print('A is inside edge ' + str(i + 1))
             # elif(f < 0): print('A is outside edge ' + str(i + 1))
             # else: print('A is on edge ' + str(i + 1))
 
-            f2 = np.matmul(np.subtract(B, ep1), N)
+            f2 = np.matmul(np.subtract(B, P), N)
             # if(f2 > 0): print('B is inside edge ' + str(i + 1))
             # elif(f2 < 0): print('B is outside edge ' + str(i + 1))
             # else: print('B is on edge ' + str(i + 1))
-
+        
             if(f > 0 and f2 > 0):
-                print('trivially accepted')
+                print('trivially accepted' + ' f: ' + str(f) + ' f2: ' + str(f2))
             elif(f < 0 and f2 < 0):
-                print('trivially rejected')
+                print('trivially rejected' + ' f: ' + str(f) + ' f2: ' + str(f2))
+                print(ep1, ep2)
             else:
-                print('perform clipping')
+                print('perform clipping' + ' f: ' + str(f) + ' f2: ' + str(f2))
 
                 if(f < 0 and f2 > 0):
                     # print('entering')
 
                     t = findt(A, B, P, N)
 
-                    # print('t found at: ' + str(t))
+                    print('t found at: ' + str(t))
                     entering.append(t)
 
                     C = parametriclineequation(A, B, t)
-                    
-                    if(N[0] != 0):
-                        C = (C[0], A[1] )
-                    elif(N[1] != 0):
-                        C = (A[0], C[1])
+                    print('entering ' + str(C))
+                    # if(N[0] != 0):
+                    #     C = (A[0], C[1] )
+                    # elif(N[1] != 0):
+                    #     C = (C[0], A[1])
                     
                     Cv = ([C[0], C[1]])
                     A = Cv
@@ -150,15 +188,15 @@ def cyrusbeck(P1, P2, V, E, S):
 
                     t = np.matmul(AP, N) / np.matmul(AB, N)
 
-                    # print('t found at: ' + str(t))
+                    print('t found at: ' + str(t))
                     leaving.append(t)
 
                     C = parametriclineequation(A, B, t)
-                    
-                    if(N[0] != 0):
-                        C = (C[0], B[1])
-                    elif(N[1] != 0):
-                        C = (B[0], C[1])
+                    print('leaving ' + str(C))
+                    # if(N[0] != 0):
+                    #     C = (B[0], C[1])
+                    # elif(N[1] != 0):
+                    #     C = (C[0], B[1])
 
                     Cv = ([C[0], C[1]])
                     B = Cv
@@ -176,17 +214,13 @@ def cyrusbeck(P1, P2, V, E, S):
 
         if(len(entering) < 1):
             te = 0
+            tl = 1
         elif(len(leaving) < 1):
-            tl = 0
+            te = 0
+            tl = 1
         else:
             te = max(entering)
             tl = min(leaving)
-
-        # enteringdict = dict(zip(entering, enteringC))
-        # leavingdict = dict(zip(leaving, leavingC))
-
-        # print(enteringdict[te])
-        # print(leavingdict[tl])
 
         if(te <= tl):
             print('AB accepted')
@@ -194,9 +228,23 @@ def cyrusbeck(P1, P2, V, E, S):
             print('B = ' + str(P2))
             print('A prime = ' + str(A))
             print('B prime = ' + str(B))
+            res.append((A, B))
         elif(te > tl):
             print('AB rejected')
+            print('te: ' + str(te) + ' tl: ' + str(tl))
         else:
             print('AB accepted no clipping')
+
+    
+    frontres = res[0]
+    print('xy', frontres)
+    topres = res[1]
+    print('xz-', topres)
+    leftres = res[2]
+    print('zy', leftres)
+    P1res = (frontres[0][0], leftres[0][1], -topres[0][1])
+    print('P1 prime:', P1res)
+    P2res = (frontres[1][0], frontres[1][1], -topres[1][1])
+    print('P2 prime:', P2res)
 
 cyrusbeck(P1, P2, V, edges, surfaces)
