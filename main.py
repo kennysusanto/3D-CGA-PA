@@ -164,28 +164,75 @@ class Application(tk.Frame):
         v = np.divide(upp, upp_mag)
 
         u = np.cross(v, N)
-        print(u)
 
-        A = ([ux, vx, Nx, 0],
-             [uy, vy, Ny, 0],
-             [uz, vz, Nz, 0],
-             [rpx, rpy, rpz, 1])
+        H2 = []
 
-        DOP = [DOPx, DOPy, DOPz]
+        for i in range(len(H)):
+            P = H[i]
+            Pv = ([P[0], P[1], P[2]])
+            a = np.dot(np.subtract(Pv, VRP), u)
+            b = np.dot(np.subtract(Pv, VRP), v)
+            c = np.dot(np.subtract(Pv, VRP), N)
+            P2 = (a, b, c)
+            H2.append(P2)
+
+
+        CW = ([(umax + umin)/2, (vmax + vmin)/2, 0])
+        DOP = np.subtract(CW, COP)
         
-        shx = -DOPx/DOPz
-        shy = -DOPy/DOPz
+        DOPx = DOP[0]
+        DOPy = DOP[1]
+        DOPz = DOP[2]
+        shx = -(DOPx/DOPz)
+        shy = -(DOPy/DOPz)
+        
+        H3 = []
+        for i in range(len(H2)):
+            P = H2[i]
+            res = cs.Translate(P, COP)
+            P3 = (res[0], res[1], res[2])
+            H3.append(P3)
 
-        T3 = ([1, 0, 0, 0],
+        T4 = ([1, 0, 0, 0],
               [0, 1, 0, 0],
               [shx, shy, 1, 0],
               [0, 0, 0, 1])
 
-        T4 = ([-(umin+umax)/2, -(vmin+vmax)/2, -F])
+        H4 = []
+        for i in range(len(H3)):
+            P = H3[i]
+            Pv = ([P[0], P[1], P[2], 1])
+            res = np.matmul(Pv, T4)
+            P4 = (res[0], res[1], res[2])
+            H4.append(P4)
 
-        T5 = ([2/(umax-umin), 2/(vmax-vmin), 1/(F-B)])
+        F = fp
+        B = bp
 
-        pr2 = cs.pr2mat
+        COPz = COP[2]
+        BP4 = B - COPz
+        VP4 = -COPz
+
+        h = ((COPz - B) * (vmax - vmin)) / (2 * COPz)
+        w = ((B - COPz) * (umax - umin)) / (2 * COPz)
+
+        T5 = ([1/w, 1/h, -(1/BP4)])
+
+        H5 = []
+        for i in range(len(H4)):
+            res = cs.Scale(H4[i], T5)
+            P5 = (res[0], res[1], res[2])
+            H5.append(P5)
+
+        VP5 = COPz / (B - COPz)
+        
+        # T6 clipping not yet implemented
+
+        T7 = ([0, 0, -VP5])
+
+        
+
+
 
 
     

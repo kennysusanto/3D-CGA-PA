@@ -89,15 +89,28 @@ def getVtobl(objmat, vi, alfa):
     res = np.matmul(objmat, vt)
     return res
 
-# Scale Transformation
+# Scaling Transformation
 def Scale(P, V):
-    S = ([V[0], 0, 0, 0],
-         [0, V[1], 0, 0],
-         [0, 0, V[2], 0],
+    sx = V[0]
+    sy = V[1]
+    sz = V[2]
+    S = ([sx, 0, 0, 0],
+         [0, sy, 0, 0],
+         [0, 0, sz, 0],
          [0, 0, 0, 1])
-    Point = ([P[0]],
-             [P[1]],
-             [P[2]],
-             [1])
-    res = np.matmul(S, Point)
+    Point = ([P[0], P[1], P[2], 1])
+    res = np.matmul(Point, S)
+    return res
+
+# Translation Transformation
+def Translate(P, V):
+    dx = V[0]
+    dy = V[1]
+    dz = V[2]
+    T = ([1, 0, 0, 0],
+         [0, 1, 0, 0],
+         [0, 0, 1, 0],
+         [dx, dy, dz, 1])
+    Point = ([P[0], P[1], P[2], 1])
+    res = np.matmul(Point, T)
     return res
