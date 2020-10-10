@@ -1,6 +1,7 @@
 import tkinter as tk
 import classes as cs
 import numpy as np
+import math
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -139,16 +140,31 @@ class Application(tk.Frame):
     def parallelProj(self, h):
         H = h
 
-        VRP = ([self.vrpx.get(), self.vrpy.get(), self.vrpz.get()])
-        VPN = ([self.vpnx.get(), self.vpny.get(), self.vpnz.get()])
-        VUP = ([self.vupx.get(), self.vupy.get(), self.vupz.get()])
-        COP = ([self.copx.get(), self.copy.get(), self.copz.get()])
-        umin = self.umin.get()
-        vmin = self.vmin.get()
-        umax = self.umax.get()
-        vmax = self.vmax.get()
-        fp = self.fp.get()
-        bp = self.bp.get()
+        VRP = ([float(self.vrpx.get()), float(self.vrpy.get()), float(self.vrpz.get())])
+        VPN = ([float(self.vpnx.get()), float(self.vpny.get()), float(self.vpnz.get())])
+        VUP = ([float(self.vupx.get()), float(self.vupy.get()), float(self.vupz.get())])
+        COP = ([float(self.copx.get()), float(self.copy.get()), float(self.copz.get())])
+        umin = float(self.umin.get())
+        vmin = float(self.vmin.get())
+        umax = float(self.umax.get())
+        vmax = float(self.vmax.get())
+        fp = float(self.fp.get())
+        bp = float(self.bp.get())
+
+        VPN_mag = math.sqrt(VPN[0] + VPN[1] + VPN[2])
+        N = np.divide(VPN, VPN_mag)
+
+        VUP_mag = math.sqrt(VUP[0] + VUP[1] + VUP[2])
+        up = np.divide(VUP, VUP_mag)
+
+        upp = np.subtract(up, np.dot(np.dot(up, N), N))
+        
+        upp_mag = math.sqrt(upp[0] + upp[1] + upp[2])
+
+        v = np.divide(upp, upp_mag)
+
+        u = np.cross(v, N)
+        print(u)
 
         A = ([ux, vx, Nx, 0],
              [uy, vy, Ny, 0],
