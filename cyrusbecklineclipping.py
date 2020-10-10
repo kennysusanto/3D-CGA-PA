@@ -242,9 +242,9 @@ def cyrusbeck(P1, P2, V, E, S):
     print('xz-', topres)
     leftres = res[2]
     print('zy', leftres)
-    P1res = (frontres[0][0], leftres[0][1], -topres[0][1])
+    P1res = (topres[0][0], leftres[0][1], -topres[0][1])
     print('P1 prime:', P1res)
-    P2res = (frontres[1][0], frontres[1][1], -topres[1][1])
+    P2res = (topres[1][0], frontres[1][1], -topres[1][1])
     print('P2 prime:', P2res)
 
 cyrusbeck(P1, P2, V, edges, surfaces)
