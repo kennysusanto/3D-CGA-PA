@@ -151,15 +151,15 @@ class Application(tk.Frame):
         fp = float(self.fp.get())
         bp = float(self.bp.get())
 
-        VPN_mag = math.sqrt(VPN[0] + VPN[1] + VPN[2])
+        VPN_mag = math.sqrt(math.pow(VPN[0], 2) + math.pow(VPN[1], 2) + math.pow(VPN[2], 2))
         N = np.divide(VPN, VPN_mag)
 
-        VUP_mag = math.sqrt(VUP[0] + VUP[1] + VUP[2])
+        VUP_mag = math.sqrtmath.pow(VUP[0], 2) + math.pow(VUP[1], 2) + math.pow(VUP[2], 2))
         up = np.divide(VUP, VUP_mag)
 
-        upp = np.subtract(up, np.dot(np.dot(up, N), N))
+        upp = np.subtract(up, np.multiply(N, np.dot(up, N)))
         
-        upp_mag = math.sqrt(upp[0] + upp[1] + upp[2])
+        upp_mag = math.sqrt(math.pow(upp[0], 2) + math.pow(upp[1], 2) + math.pow(upp[2], 2))
 
         v = np.divide(upp, upp_mag)
 
@@ -230,7 +230,7 @@ class Application(tk.Frame):
 
         T7 = ([0, 0, -VP5])
 
-        
+
 
 
 
