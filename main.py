@@ -295,7 +295,6 @@ class Application(tk.Frame):
                 H6.append(res[0])
             # print(res)
 
-        
         VP5 = COPz / (B - COPz)
         T7 = ([0, 0, -VP5])
 
@@ -306,6 +305,8 @@ class Application(tk.Frame):
             P7 = (res[0], res[1], res[2])
             H7.append(P7)
             # print(P7)
+
+        
 
         T8 = ([(COPz - B) / COPz, 0, 0, 0],
               [0, (COPz - B) / COPz, 0, 0],
@@ -349,20 +350,27 @@ class Application(tk.Frame):
             # print(P10)
         
         # drawing
+
+        H10b = []
+        minusY = ([-1, -1, 1])
+        for i in range(len(H9)):
+            P = H10[i]
+            res = cs.Scale(P, minusY)
+            H10b.append(res)
         
         cwidth = self.canvas.winfo_width()
         cheight = self.canvas.winfo_height()
         cow = (cwidth / 2, cheight / 2)
 
         H11 = []
-        for p in H10:
+        for p in H10b:
             P = list(p)
             P[0] *= cow[0]
             P[1] *= cow[1]
             P[0] += cow[0]
             P[1] += cow[1]
             H11.append(P)
-            print(P)
+            # print(P)
         
         Hedges11 = []
         Hedges11.append((H11[0], H11[1]))
@@ -389,9 +397,53 @@ class Application(tk.Frame):
             # print(p1, p2)
             self.canvas.create_line(p1[0], p1[1], p2[0], p2[1])
 
+        print('\nH2')
+        for i in H2:
+            print(i)
 
+        print('\nH3')
+        for i in H3:
+            print(i)
 
+        print('\nH4')
+        for i in H4:
+            print(i)
+
+        print('\n')
+        print('w', w, 1/w)
+        print('h', h, 1/h)
+        print('bp4', BP4, -(1/BP4))
+        print('\nH5')
+        for i in H5:
+            print(i)
+
+        print('\nH6')
+        for i in H6:
+            print(i)
+
+        print('\nH7')
+        for i in H7:
+            print(i)
         
+        print('\nH8')
+        for i in H8:
+            print(i)
+
+        print('\nH9')
+        for i in H9:
+            print(i)
+        
+        print('\nH10')
+        for i in H10:
+            print(i)
+        
+        print('\nH10b')
+        for i in H10b:
+            print(i)
+        
+        print('\nH11')
+        for i in H11:
+            print(i)
         
 
     def refreshView(self):
