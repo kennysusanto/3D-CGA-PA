@@ -249,4 +249,4 @@ def cyrusbeck(P1, P2, V, E, S):
 
     return P1res, P2res
 
-cyrusbeck(P1, P2, V, edges, surfaces)
+# cyrusbeck(P1, P2, V, edges, surfaces)

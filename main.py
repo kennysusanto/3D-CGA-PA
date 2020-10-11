@@ -24,9 +24,9 @@ class Application(tk.Frame):
         self.frame4.pack(side='bottom', fill='both')
 
         self.canvas = tk.Canvas(self.frame1, height=480, width=580)
-        coord = 10, 10, 300, 300
-        arc = self.canvas.create_arc(coord, start=0, extent=150, fill="red")
-        arv2 = self.canvas.create_arc(coord, start=150, extent=215, fill="green")
+        # coord = 10, 10, 300, 300
+        # arc = self.canvas.create_arc(coord, start=0, extent=150, fill="red")
+        # arv2 = self.canvas.create_arc(coord, start=150, extent=215, fill="green")
         self.canvas.place(relx=0.5, rely=0.5, anchor='center')
         self.canvas.pack()
 
@@ -138,7 +138,8 @@ class Application(tk.Frame):
 
         return H
 
-    def parallelProj(self):
+    def perspectiveProj(self):
+        self.canvas.delete('all')
         H = self.theboringhouse()
 
         VRP = ([float(self.vrpx.get()), float(self.vrpy.get()), float(self.vrpz.get())])
@@ -206,6 +207,7 @@ class Application(tk.Frame):
             res = np.matmul(Pv, T4)
             P4 = (res[0], res[1], res[2])
             H4.append(P4)
+            # print(P4)
 
         F = fp
         B = bp
@@ -224,9 +226,11 @@ class Application(tk.Frame):
             res = cs.Scale(H4[i], T5)
             P5 = (res[0], res[1], res[2])
             H5.append(P5)
+            # print(P5)
 
                 
         # T6 clipping not yet implemented
+        print('\n')
 
         Hedges = []
         Hedges.append((H5[0], H5[1]))
@@ -289,6 +293,7 @@ class Application(tk.Frame):
             tmp.append(res)
             if(i < 10):
                 H6.append(res[0])
+            # print(res)
 
         
         VP5 = COPz / (B - COPz)
@@ -300,6 +305,7 @@ class Application(tk.Frame):
             res = cs.Translate(P, T7)
             P7 = (res[0], res[1], res[2])
             H7.append(P7)
+            # print(P7)
 
         T8 = ([(COPz - B) / COPz, 0, 0, 0],
               [0, (COPz - B) / COPz, 0, 0],
@@ -314,6 +320,7 @@ class Application(tk.Frame):
             res = np.matmul(Pv, T8)
             P8 = (res[0], res[1], res[2])
             H8.append(P8)
+            # print(P8)
 
         COPz8 = COPz / (COPz - B)
         T9 = ([1, 0, 0, 0],
@@ -329,18 +336,68 @@ class Application(tk.Frame):
             res = np.matmul(Pv, T9)
             P9 = (res[0], res[1], res[2])
             H9.append(P9)
+            # print(P9)
 
-        print('\n')
-        for p in H9:
-            print(p)
+        
+        H10 = []
+        for i in range(len(H9)):
+            P = H9[i]
+            Pv = ([P[0], P[1], P[2], 1])
+            res = np.matmul(Pv, cs.pr2mat)
+            P10 = (res[0], res[1], res[2])
+            H10.append(P10)
+            # print(P10)
+        
+        # drawing
+        
+        cwidth = self.canvas.winfo_width()
+        cheight = self.canvas.winfo_height()
+        cow = (cwidth / 2, cheight / 2)
 
-        # tinggal gambar di canvas
+        H11 = []
+        for p in H10:
+            P = list(p)
+            P[0] *= cow[0]
+            P[1] *= cow[1]
+            P[0] += cow[0]
+            P[1] += cow[1]
+            H11.append(P)
+            print(P)
+        
+        Hedges11 = []
+        Hedges11.append((H11[0], H11[1]))
+        Hedges11.append((H11[1], H11[2]))
+        Hedges11.append((H11[2], H11[3]))
+        Hedges11.append((H11[3], H11[4]))
+        Hedges11.append((H11[4], H11[0]))
+        
+        Hedges11.append((H11[5], H11[6]))
+        Hedges11.append((H11[6], H11[7]))
+        Hedges11.append((H11[7], H11[8]))
+        Hedges11.append((H11[8], H11[9]))
+        Hedges11.append((H11[9], H11[5]))
+
+        Hedges11.append((H11[0], H11[5]))
+        Hedges11.append((H11[1], H11[6]))
+        Hedges11.append((H11[2], H11[7]))
+        Hedges11.append((H11[3], H11[8]))
+        Hedges11.append((H11[4], H11[9]))
+        
+        for e in Hedges11:
+            p1 = e[0]
+            p2 = e[1]
+            # print(p1, p2)
+            self.canvas.create_line(p1[0], p1[1], p2[0], p2[1])
+
+
+
+        
         
 
     def refreshView(self):
         print("refresh!")
         
-        self.parallelProj()
+        self.perspectiveProj()
 
 
     
@@ -390,6 +447,7 @@ class Application(tk.Frame):
         self.bp.delete(0, tk.END)
         self.bp.insert(0, '-10')
         
+        self.perspectiveProj()
         return
 
 
