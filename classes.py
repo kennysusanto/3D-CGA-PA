@@ -110,7 +110,7 @@ def Translate(P, V):
     T = ([1, 0, 0, 0],
          [0, 1, 0, 0],
          [0, 0, 1, 0],
-         [dx, dy, dz, 1])
+         [-dx, -dy, -dz, 1])
     Point = ([P[0], P[1], P[2], 1])
     res = np.matmul(Point, T)
     return res
