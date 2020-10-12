@@ -2,7 +2,7 @@ import tkinter as tk
 import classes as cs
 import numpy as np
 import math
-
+from PIL import Image, ImageTk
 import cyrusbecklineclipping as cb
 
 class Application(tk.Frame):
@@ -888,6 +888,12 @@ root = tk.Tk()
 
 root.geometry('1350x480+200+200') # ganti ukuran window disini
 root.resizable(False, False)
+
+# Setting icon of master window 
+image = Image.open("logo.jpg")
+photo = ImageTk.PhotoImage(image)
+root.iconphoto(False, photo) 
+
 app = Application(master=root)
 
 #def motion(event):
@@ -896,14 +902,10 @@ app = Application(master=root)
 
 #root.bind('<Motion>', motion)
 
-perpectivelbl = tk.Label(app,
-                       text='Perspective Projection',bg="#23252a",fg="yellowgreen")
+perpectivelbl = tk.Label(app, text='Perspective Projection',bg="#23252a",fg="yellowgreen")
 perpectivelbl.place(x = 180,y=26,width=130,height=30)
 
-parallellbl = tk.Label(app,
-                       text='Parallel Projection',bg="#23252a",fg="yellowgreen")
+parallellbl = tk.Label(app, text='Parallel Projection',bg="#23252a",fg="yellowgreen")
 parallellbl.place(x = 1050,y=26,width=130,height=30)
-
-
 
 app.mainloop()
