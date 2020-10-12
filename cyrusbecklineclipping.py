@@ -80,7 +80,7 @@ def cyrusbeck(P1, P2, V, E, S):
 
         surfacedict = {0:'front', 1:'back', 2:'top', 3:'bottom', 4:'left', 5:'right'}
 
-        print('\nsurface: ' + surfacedict[s])
+        # print('\nsurface: ' + surfacedict[s])
 
         if(s == 0):
             # front (x, y)
@@ -153,12 +153,15 @@ def cyrusbeck(P1, P2, V, E, S):
             # else: print('B is on edge ' + str(i + 1))
         
             if(f > 0 and f2 > 0):
-                print('trivially accepted' + ' f: ' + str(f) + ' f2: ' + str(f2))
+                # print('trivially accepted' + ' f: ' + str(f) + ' f2: ' + str(f2))
+                pass
             elif(f < 0 and f2 < 0):
-                print('trivially rejected' + ' f: ' + str(f) + ' f2: ' + str(f2))
+                # print('trivially rejected' + ' f: ' + str(f) + ' f2: ' + str(f2))
+                pass
                 # print(ep1, ep2)
             else:
-                print('perform clipping' + ' f: ' + str(f) + ' f2: ' + str(f2))
+                # print('perform clipping' + ' f: ' + str(f) + ' f2: ' + str(f2))
+                pass
 
                 if(f < 0 and f2 > 0):
                     # print('entering')
@@ -204,9 +207,11 @@ def cyrusbeck(P1, P2, V, E, S):
                     # print(A)
                     # print(B)
                 elif(f == 0 or f2 == 0):
-                    print('on edge')
+                    # print('on edge')
+                    pass
                 else:
-                    print('none of the above')
+                    # print('none of the above')
+                    pass
             
 
         # max t for entering = te
@@ -223,17 +228,20 @@ def cyrusbeck(P1, P2, V, E, S):
             tl = min(leaving)
 
         if(te <= tl):
-            print('AB accepted')
+            # print('AB accepted')
+            pass
             # print('A = ' + str(P1))
             # print('B = ' + str(P2))
             # print('A prime = ' + str(A))
             # print('B prime = ' + str(B))
             res.append((A, B))
         elif(te > tl):
-            print('AB rejected')
+            # print('AB rejected')
+            pass
             # print('te: ' + str(te) + ' tl: ' + str(tl))
         else:
-            print('AB accepted no clipping')
+            # print('AB accepted no clipping')
+            pass
 
     
     frontres = res[0]
@@ -286,12 +294,15 @@ def cyrusbeckv2(P1, P2, V, E):
         # else: print('B is on edge ' + str(i + 1))
     
         if(f > 0 and f2 > 0):
-            print('trivially accepted' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            # print('trivially accepted' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            pass
         elif(f < 0 and f2 < 0):
-            print('trivially rejected' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            # print('trivially rejected' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            pass
             # print(ep1, ep2)
         else:
-            print('perform clipping' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            # print('perform clipping' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            pass
 
             if(f < 0 and f2 > 0):
                 # print('entering')
@@ -337,9 +348,11 @@ def cyrusbeckv2(P1, P2, V, E):
                 # print(A)
                 # print(B)
             elif(f == 0 or f2 == 0):
-                print('on edge')
+                # print('on edge')
+                pass
             else:
-                print('none of the above')
+                # print('none of the above')
+                pass
         
 
     # max t for entering = te
@@ -356,17 +369,20 @@ def cyrusbeckv2(P1, P2, V, E):
         tl = min(leaving)
 
     if(te <= tl):
-        print('AB accepted')
+        # print('AB accepted')
+        pass
         # print('A = ' + str(P1))
         # print('B = ' + str(P2))
         # print('A prime = ' + str(A))
         # print('B prime = ' + str(B))
         
     elif(te > tl):
-        print('AB rejected')
+        # print('AB rejected')
+        pass
         # print('te: ' + str(te) + ' tl: ' + str(tl))
     else:
-        print('AB accepted no clipping')
+        # print('AB accepted no clipping')
+        pass
 
     
     P1res = (P1[0], A[1], A[0])

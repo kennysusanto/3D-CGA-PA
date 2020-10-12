@@ -145,21 +145,42 @@ class Application(tk.Frame):
     def slidex(self, rval):
         # rval = self.sliderx.get()
         self.vpnx.delete(0, tk.END)
-        self.vpnx.insert(0, rval)
+        rval = float(rval)
+        if(rval.is_integer()):
+            rval = int(rval)
+            # print(rval)
+        else:
+            # print(rval)
+            pass
+        self.vpnx.insert(0, str(rval))
         self.perspectiveProj()
         self.parallelProj()
 
     def slidey(self, rval):
         # rval = self.sliderx.get()
+        rval = float(rval)
+        if(rval.is_integer()):
+            rval = int(rval)
+            # print(rval)
+        else:
+            # print(rval)
+            pass
         self.vpny.delete(0, tk.END)
-        self.vpny.insert(0, rval)
+        self.vpny.insert(0, str(rval))
         self.perspectiveProj()
         self.parallelProj()
 
     def slidez(self, rval):
         # rval = self.sliderx.get()
+        rval = float(rval)
+        if(rval.is_integer()):
+            rval = int(rval)
+            # print(rval)
+        else:
+            # print(rval)
+            pass
         self.vpnz.delete(0, tk.END)
-        self.vpnz.insert(0, rval)
+        self.vpnz.insert(0, str(rval))
         self.perspectiveProj()
         self.parallelProj()
 
@@ -281,7 +302,7 @@ class Application(tk.Frame):
 
                 
         # T6 clipping not yet implemented
-        print('\n')
+        # print('\n')
 
         Hedges = []
         Hedges.append((H5[0], H5[1]))
@@ -472,72 +493,72 @@ class Application(tk.Frame):
             else:
                 self.canvas.create_line(p1[0], p1[1], p2[0], p2[1],fill="black",width=2.5)
 
-        print('\n')
-        print(VRP)
-        print(N, v, u)
-        print('\nH1')
-        for i in H:
-            print(i)
+        # print('\n')
+        # print(VRP)
+        # print(N, v, u)
+        # print('\nH1')
+        # for i in H:
+        #     print(i)
         
-        print('\nH2')
-        for i in H2:
-            print(i)
+        # print('\nH2')
+        # for i in H2:
+        #     print(i)
 
-        print('\nH3')
-        for i in H3:
-            print(i)
+        # print('\nH3')
+        # for i in H3:
+        #     print(i)
 
-        print('\n')
-        print(DOP)
-        print(shx, shy)
-        print('\nH4')
-        for i in H4:
-            print(i)
+        # print('\n')
+        # print(DOP)
+        # print(shx, shy)
+        # print('\nH4')
+        # for i in H4:
+        #     print(i)
 
-        print('\n')
-        print('w', w, 1/w)
-        print('h', h, 1/h)
-        print('bp4', BP4, -(1/BP4))
-        print('\nH5')
-        for i in H5:
-            print(i)
+        # print('\n')
+        # print('w', w, 1/w)
+        # print('h', h, 1/h)
+        # print('bp4', BP4, -(1/BP4))
+        # print('\nH5')
+        # for i in H5:
+        #     print(i)
 
-        print('\nH6')
-        for i in H6:
-            print(i)
+        # print('\nH6')
+        # for i in H6:
+        #     print(i)
 
-        print('\nH7')
-        for i in H7:
-            print(i)
+        # print('\nH7')
+        # for i in H7:
+        #     print(i)
         
-        print('\n')
-        print(B, COPz)
-        print(B-COPz, COPz-B)
-        print(umax7, vmax7)
-        print(1/umax7, 1/vmax7)
-        print('\nH8')
-        for i in H8:
-            print(i)
+        # print('\n')
+        # print(B, COPz)
+        # print(B-COPz, COPz-B)
+        # print(umax7, vmax7)
+        # print(1/umax7, 1/vmax7)
+        # print('\nH8')
+        # for i in H8:
+        #     print(i)
 
-        print('\nH9')
-        for i in H9:
-            print(i)
+        # print('\nH9')
+        # for i in H9:
+        #     print(i)
         
-        print('\nH10')
-        for i in H10:
-            print(i)
+        # print('\nH10')
+        # for i in H10:
+        #     print(i)
         
-        print('\nH10b')
-        for i in H10b:
-            print(i)
+        # print('\nH10b')
+        # for i in H10b:
+        #     print(i)
         
-        print('\nH11')
-        for i in H11:
-            print(i)
+        # print('\nH11')
+        # for i in H11:
+        #     print(i)
         
-        print('\nHtest')
-        for i in Htest:
-            print(i)
+        # print('\nHtest')
+        # for i in Htest:
+        #     print(i)
     
     def parallelProj(self):
         self.canvas2.delete('all') # ganti ini jadi canvas yg kedua
@@ -631,7 +652,7 @@ class Application(tk.Frame):
 
                 
         # T6 clipping not yet implemented
-        print('\n')
+        # print('\n')
 
         Hedges = []
         Hedges.append((H5[0], H5[1]))
@@ -824,7 +845,11 @@ class Application(tk.Frame):
 
         self.perspectiveProj()
         self.parallelProj()
-        # tambah function parallelproj
+
+        VPN = ([float(self.vpnx.get()), float(self.vpny.get()), float(self.vpnz.get())])
+        self.sVPNx.set(str(VPN[0]))
+        self.sVPNy.set(str(VPN[1]))
+        self.sVPNz.set(str(VPN[2]))
 
 
     
