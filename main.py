@@ -2,6 +2,7 @@ import tkinter as tk
 import classes as cs
 import numpy as np
 import math
+
 import cyrusbecklineclipping as cb
 
 class Application(tk.Frame):
@@ -25,7 +26,7 @@ class Application(tk.Frame):
         self.frame4 = tk.Frame(self.frame2, padx=pad20, pady=pad20)
         self.frame4.pack(side='bottom', fill='both')
 
-        self.canvas = tk.Canvas(self.frame1, height=480, width=580)
+        self.canvas = tk.Canvas(self.frame1, height=480, width=480)
         # coord = 10, 10, 300, 300
         # arc = self.canvas.create_arc(coord, start=0, extent=150, fill="red")
         # arv2 = self.canvas.create_arc(coord, start=150, extent=215, fill="green")
@@ -33,6 +34,9 @@ class Application(tk.Frame):
         self.canvas.pack()
 
         # tambah canvas 2 disini di self.frame5
+        self.canvas2 = tk.Canvas(self.frame5, height=480, width=480)
+        self.canvas2.place(relx=0.5, rely=0.5, anchor='center')
+        self.canvas2.pack()
 
         self.vrplbl = tk.Label(self.frame3, text="VRP:").grid(sticky='e', row=0, column=0)
         self.vpnlbl = tk.Label(self.frame3, text="VPN:").grid(sticky='e', row=1, column=0)
@@ -421,9 +425,9 @@ class Application(tk.Frame):
             p2 = e[1]
             # print(p1, p2)
             if(i < 5):
-                self.canvas.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=5)
+                self.canvas.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
             else:
-                self.canvas.create_line(p1[0], p1[1], p2[0], p2[1])
+                self.canvas.create_line(p1[0], p1[1], p2[0], p2[1],fill="black",width=2.5)
 
         print('\n')
         print(VRP)
@@ -493,7 +497,7 @@ class Application(tk.Frame):
             print(i)
     
     def parallelProj(self):
-        self.canvas.delete('all') # ganti ini jadi canvas yg kedua
+        self.canvas2.delete('all') # ganti ini jadi canvas yg kedua
         H = self.theboringhouse()
 
         VRP = ([float(self.vrpx.get()), float(self.vrpy.get()), float(self.vrpz.get())])
@@ -763,15 +767,20 @@ class Application(tk.Frame):
             p2 = e[1]
             # print(p1, p2)
             if(i < 5):
-                self.canvas.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=5) # ganti ini jadi kanvas kedua
+                self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=5) # ganti ini jadi kanvas kedua
             else:
-                self.canvas.create_line(p1[0], p1[1], p2[0], p2[1]) # ganti ini jadi canvas kedua
+                self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1]) # ganti ini jadi canvas kedua
+
+
+
+
 
     def refreshView(self):
-        print("refresh!")
-        
-        self.perspectiveProj()
 
+        print("refresh!")
+
+        self.perspectiveProj()
+        self.parallelProj()
         # tambah function parallelproj
 
 
@@ -823,12 +832,31 @@ class Application(tk.Frame):
         self.bp.insert(0, '-10')
         
         self.perspectiveProj()
+        self.parallelProj()
         # tambah function parallelproj
         return
 
 
 root = tk.Tk()
-root.geometry('1024x480+200+200') # ganti ukuran window disini
+
+root.geometry('1350x480+200+200') # ganti ukuran window disini
 root.resizable(False, False)
 app = Application(master=root)
+
+#def motion(event):
+ #   x, y = event.x, event.y
+  #  print('{}, {}'.format(x, y))
+
+#root.bind('<Motion>', motion)
+
+perpectivelbl = tk.Label(app,
+                       text='Perspective Projection',bg="#23252a",fg="yellowgreen")
+perpectivelbl.place(x = 180,y=26,width=130,height=30)
+
+parallellbl = tk.Label(app,
+                       text='Parallel Projection',bg="#23252a",fg="yellowgreen")
+parallellbl.place(x = 1050,y=26,width=130,height=30)
+
+
+
 app.mainloop()
