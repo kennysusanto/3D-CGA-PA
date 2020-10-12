@@ -112,13 +112,56 @@ class Application(tk.Frame):
         self.bp.insert(0, '-10')
 
         self.refreshbtn = tk.Button(self.frame3, text='Refresh', command=self.refreshView)
-        self.refreshbtn.grid(row=8, column=0, sticky='nesw', columnspan=2)
+        self.refreshbtn.grid(row=8, column=0, sticky='nesw', columnspan=4)
 
         self.resetbtn = tk.Button(self.frame3, text='Reset', command=self.resetView)
-        self.resetbtn.grid(row=9, column=0, sticky='nesw')
+        self.resetbtn.grid(row=9, column=0, sticky='nesw', columnspan=2)
 
         self.quit = tk.Button(self.frame3, text="QUIT", fg="red", command=self.master.destroy)
-        self.quit.grid(row=9, column=1, sticky='nesw')
+        self.quit.grid(row=9, column=2, sticky='nesw', columnspan=2)
+
+        self.sVPNxlbl = tk.Label(self.frame3, text='VPNx slider:')
+        self.sVPNxlbl.grid(row=10, column=0)
+        
+        self.sVPNx = tk.Scale(self.frame3, from_=-1, to=1, resolution=0.1, orient=tk.HORIZONTAL, command=self.slidex)
+        self.sVPNx.set(0)
+        self.sVPNx.grid(row=10, column=1, columnspan=3, sticky='nesw')
+
+        self.sVPNylbl = tk.Label(self.frame3, text='VPNy slider:')
+        self.sVPNylbl.grid(row=11, column=0)
+        
+        self.sVPNy = tk.Scale(self.frame3, from_=-1, to=1, resolution=0.1, orient=tk.HORIZONTAL, command=self.slidey)
+        self.sVPNy.set(0)
+        self.sVPNy.grid(row=11, column=1, columnspan=3, sticky='nesw')
+
+        self.sVPNzlbl = tk.Label(self.frame3, text='VPNz slider:')
+        self.sVPNzlbl.grid(row=12, column=0)
+        
+        self.sVPNz = tk.Scale(self.frame3, from_=-1, to=1, resolution=0.1, orient=tk.HORIZONTAL, command=self.slidez)
+        self.sVPNz.set(1)
+        self.sVPNz.grid(row=12, column=1, columnspan=3, sticky='nesw')
+
+
+    def slidex(self, rval):
+        # rval = self.sliderx.get()
+        self.vpnx.delete(0, tk.END)
+        self.vpnx.insert(0, rval)
+        self.perspectiveProj()
+        self.parallelProj()
+
+    def slidey(self, rval):
+        # rval = self.sliderx.get()
+        self.vpny.delete(0, tk.END)
+        self.vpny.insert(0, rval)
+        self.perspectiveProj()
+        self.parallelProj()
+
+    def slidez(self, rval):
+        # rval = self.sliderx.get()
+        self.vpnz.delete(0, tk.END)
+        self.vpnz.insert(0, rval)
+        self.perspectiveProj()
+        self.parallelProj()
 
     def theboringhouse(self):
         # absval = 5
@@ -830,6 +873,10 @@ class Application(tk.Frame):
         self.fp.insert(0, '2')
         self.bp.delete(0, tk.END)
         self.bp.insert(0, '-10')
+
+        self.sVPNx.set(0)
+        self.sVPNy.set(0)
+        self.sVPNz.set(1)
         
         self.perspectiveProj()
         self.parallelProj()
