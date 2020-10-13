@@ -453,15 +453,27 @@ class Application(tk.Frame):
         
         cwidth = self.canvas.winfo_width()
         cheight = self.canvas.winfo_height()
-        cow = (cwidth / 2, cheight / 2)
+        coc = (cwidth / 2, cheight / 2)
+
+        wwidth = 300
+        wheight = 300
+        w1 = (coc[0] - (wwidth / 2), coc[1] - (wheight / 2))
+        w2 = (coc[0] + (wwidth / 2), coc[1] - (wheight / 2))
+        w3 = (coc[0] + (wwidth / 2), coc[1] + (wheight / 2))
+        w4 = (coc[0] - (wwidth / 2), coc[1] + (wheight / 2))
+
+        self.canvas.create_line(w1[0], w1[1], w2[0], w2[1])
+        self.canvas.create_line(w2[0], w2[1], w3[0], w3[1])
+        self.canvas.create_line(w3[0], w3[1], w4[0], w4[1])
+        self.canvas.create_line(w4[0], w4[1], w1[0], w1[1])
 
         H11 = []
         for p in H10b:
             P = list(p)
-            P[0] *= cow[0]
-            P[1] *= cow[1]
-            P[0] += cow[0]
-            P[1] += cow[1]
+            P[0] *= coc[0] - 75
+            P[1] *= coc[1] - 75
+            P[0] += coc[0]
+            P[1] += coc[1]
             H11.append(P)
             # print(P)
         
@@ -795,15 +807,27 @@ class Application(tk.Frame):
         
         cwidth = self.canvas.winfo_width()
         cheight = self.canvas.winfo_height()
-        cow = (cwidth / 2, cheight / 2)
+        coc = (cwidth / 2, cheight / 2)
+
+        wwidth = 300
+        wheight = 300
+        w1 = (coc[0] - (wwidth / 2), coc[1] - (wheight / 2))
+        w2 = (coc[0] + (wwidth / 2), coc[1] - (wheight / 2))
+        w3 = (coc[0] + (wwidth / 2), coc[1] + (wheight / 2))
+        w4 = (coc[0] - (wwidth / 2), coc[1] + (wheight / 2))
+
+        self.canvas2.create_line(w1[0], w1[1], w2[0], w2[1])
+        self.canvas2.create_line(w2[0], w2[1], w3[0], w3[1])
+        self.canvas2.create_line(w3[0], w3[1], w4[0], w4[1])
+        self.canvas2.create_line(w4[0], w4[1], w1[0], w1[1])
 
         H11 = []
         for p in H10b:
             P = list(p)
-            P[0] *= cow[0]
-            P[1] *= cow[1]
-            P[0] += cow[0]
-            P[1] += cow[1]
+            P[0] *= coc[0] - 100
+            P[1] *= coc[1] - 100
+            P[0] += coc[0]
+            P[1] += coc[1]
             H11.append(P)
             # print(P)
         

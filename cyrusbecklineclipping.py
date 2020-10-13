@@ -186,10 +186,7 @@ def cyrusbeck(P1, P2, V, E, S):
                 elif(f > 0 and f2 < 0):
                     # print('leaving')
 
-                    AP = np.subtract(A, P)
-                    AB = np.subtract(A, B)
-
-                    t = np.matmul(AP, N) / np.matmul(AB, N)
+                    t = findt(A, B, P, N)
 
                     # print('t found at: ' + str(t))
                     leaving.append(t)
@@ -282,6 +279,7 @@ def cyrusbeckv2(P1, P2, V, E):
         # print('N: ' + str(N))
 
         P = ep2
+        # print(P)
 
         f = np.matmul(np.subtract(A, P), N)
         # if(f > 0): print('A is inside edge ' + str(i + 1))
@@ -327,10 +325,7 @@ def cyrusbeckv2(P1, P2, V, E):
             elif(f > 0 and f2 < 0):
                 # print('leaving')
 
-                AP = np.subtract(A, P)
-                AB = np.subtract(A, B)
-
-                t = np.matmul(AP, N) / np.matmul(AB, N)
+                t = findt(A, B, P, N)
 
                 # print('t found at: ' + str(t))
                 leaving.append(t)
@@ -390,4 +385,16 @@ def cyrusbeckv2(P1, P2, V, E):
 
     return P1res, P2res
 
-# cyrusbeck(P1, P2, V, edges, surfaces)
+# P3 = (0, 0, -math.sqrt(2))
+# P4 = (0, 0, ((9 * math.sqrt(2))/5))
+# V2 = []
+# V2.append((0, 2))
+# V2.append((5, 2))
+# V2.append((5, -2))
+# V2.append((0, -2))
+# E2 = []
+# E2.append((V2[0], V2[1]))
+# E2.append((V2[1], V2[2]))
+# E2.append((V2[2], V2[3]))
+# E2.append((V2[3], V2[0]))
+# print(cyrusbeckv2(P3, P4, V2, E2))
