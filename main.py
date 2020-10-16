@@ -197,16 +197,17 @@ class Application(tk.Frame):
         # V[7] = [-absval, -absval, -absval]
 
         H = []
-        H.append([-1, -1, 1])  # A
-        H.append([1, -1, 1])   # B 
-        H.append([1, 0, 1])    # C
-        H.append([0, 1, 1])    # D
-        H.append([-1, 0, 1])   # E
-        H.append([-1, -1, -1]) # F
-        H.append([1, -1, -1])  # G
-        H.append([1, 0, -1])   # H
-        H.append([0, 1, -1])   # I
-        H.append([-1, 0, -1])  # J
+        val = 1
+        H.append([-val, -val, val])  # A
+        H.append([val, -val, val])   # B 
+        H.append([val, 0, val])    # C
+        H.append([0, val, val])    # D
+        H.append([-val, 0, val])   # E
+        H.append([-val, -val, -val]) # F
+        H.append([val, -val, -val])  # G
+        H.append([val, 0, -val])   # H
+        H.append([0, val, -val])   # I
+        H.append([-val, 0, -val])  # J
 
         return H
 
@@ -239,17 +240,26 @@ class Application(tk.Frame):
 
         u = np.cross(v, N)
 
+        r = ([VRP[0], VRP[1], VRP[2]])
+
+        rp = ([np.dot(np.negative(r), u), np.dot(np.negative(r), v), np.dot(np.negative(r), N)])
+
+        A = ([u[0], v[0], N[0], 0],
+             [u[1], v[1], N[1], 0],
+             [u[2], v[2], N[2], 0],
+             [rp[0], rp[1], rp[2], 1])
+
+        COPz = COP[2]
+        F = fp
+        B = -bp
+
         H2 = []
 
-        for i in range(len(H)):
-            P = H[i]
-            Pv = ([P[0], P[1], P[2]])
-            a = np.dot(np.subtract(Pv, VRP), u)
-            b = np.dot(np.subtract(Pv, VRP), v)
-            c = np.dot(np.subtract(Pv, VRP), N)
-            P2 = (a, b, c)
+        for P in H:
+            Pv = ([P[0], P[1], P[2], 1])
+            res = np.matmul(Pv, A)
+            P2 = [res[0], res[1], res[2]]
             H2.append(P2)
-
 
         CW = ([(umax + umin)/2, (vmax + vmin)/2, 0])
         DOP = np.subtract(CW, COP)
@@ -259,13 +269,20 @@ class Application(tk.Frame):
         DOPz = DOP[2]
         shx = -(DOPx/DOPz)
         shy = -(DOPy/DOPz)
+
+        T3 = ([1, 0, 0, 0],
+              [0, 1, 0, 0],
+              [0, 0, 1, 0],
+              [-COP[0], -COP[1], -COP[2], 1])
         
         H3 = []
-        for i in range(len(H2)):
-            P = H2[i]
+        for P in H2:
             res = cs.Translate(P, COP)
-            P3 = (res[0], res[1], res[2])
+            P3 = [res[0], res[1], res[2]]
             H3.append(P3)
+
+        F3 = F - COPz
+        B3 = B - COPz
 
         T4 = ([1, 0, 0, 0],
               [0, 1, 0, 0],
@@ -273,30 +290,32 @@ class Application(tk.Frame):
               [0, 0, 0, 1])
 
         H4 = []
-        for i in range(len(H3)):
-            P = H3[i]
+        for P in H3:
             Pv = ([P[0], P[1], P[2], 1])
             res = np.matmul(Pv, T4)
-            P4 = (res[0], res[1], res[2])
+            P4 = [res[0], res[1], res[2]]
             H4.append(P4)
             # print(P4)
 
-        F = fp
-        B = -bp
+        
+        
 
-        COPz = COP[2]
         BP4 = B - COPz
         VP4 = -COPz
 
-        h = ((COPz - B) * (vmax - vmin)) / (2 * COPz)
-        w = ((B - COPz) * (umax - umin)) / (2 * COPz)
+        h = ((B - COPz) * (vmax - vmin)) / (2 * COPz)
+        w = ((COPz - B) * (umax - umin)) / (2 * COPz)
 
-        T5 = ([1/w, 1/h, -(1/BP4)])
+        T5s = ([1/w, 1/h, (1/BP4)]) # beda
+        T5 = ([1/w, 0, 0, 0],
+              [0, 1/h, 0, 0],
+              [0, 0, -(1/BP4), 0],
+              [0, 0, 0, 1])
 
         H5 = []
-        for i in range(len(H4)):
-            res = cs.Scale(H4[i], T5)
-            P5 = (res[0], res[1], res[2])
+        for P in H4:
+            res = cs.Scale(P, T5s)
+            P5 = [res[0], res[1], res[2]]
             H5.append(P5)
             # print(P5)
 
@@ -325,9 +344,9 @@ class Application(tk.Frame):
 
         V = []
         V.append((fp, vmax))
-        V.append((bp, vmax))
-        V.append((bp, -vmin))
-        V.append((fp, -vmin))
+        V.append((-bp, vmax))
+        V.append((-bp, vmin))
+        V.append((fp, vmin))
         # V.append((umin, vmax, F))
         # V.append((umax, vmax, F))
         # V.append((umax, vmin, F))
@@ -338,10 +357,8 @@ class Application(tk.Frame):
         # V.append((umin, vmin, B))
 
         edges = []
-        edges.append((V[0], V[1]))
-        edges.append((V[1], V[2]))
-        edges.append((V[2], V[3]))
         edges.append((V[3], V[0]))
+        edges.append((V[1], V[2]))
         # edges.append((V[0], V[1])) # edge 0
         # edges.append((V[1], V[2])) # edge 1
         # edges.append((V[2], V[3])) # edge 2
@@ -367,43 +384,45 @@ class Application(tk.Frame):
 
         tmp = []
         H6 = []
-        for i in range(len(Hedges)):
-            housedge = Hedges[i]
-            res = cb.cyrusbeckv2(housedge[0], housedge[1], V, edges)
+        for i, edge in enumerate(Hedges):
+            # print(i)
+            res = cb.cyrusbeckv2(edge[0], edge[1], V, edges, debug=False)
             tmp.append(res)
             if(i < 10):
                 H6.append(res[0])
             # print(res)
         
         VP5 = COPz / (B - COPz)
-        T7 = ([0, 0, -VP5])
+        T7t = ([0, 0, VP5]) # beda
+        T7 = ([1, 0, 0, 0],
+              [0, 1, 0, 0],
+              [0, 0, 1, 0],
+              [0, 0, -VP5, 1])
 
         H7 = []
-        for i in range(len(H6)):
-            P = H6[i]
-            res = cs.Translate(P, T7)
-            P7 = (res[0], res[1], res[2])
+        for P in H6:
+            res = cs.Translate(P, T7t)
+            P7 = [res[0], res[1], res[2]]
             H7.append(P7)
             # print(P7)
 
         
-        vmax7 = COPz / (COPz - B)
+        vmax7 = COPz / (B - COPz)
 
         
-        umax7 = COPz / (B - COPz)
+        umax7 = COPz / (COPz - B)
 
-        T8 = ([1/umax7, 0, 0, 0],
+        T8 = ([1/vmax7, 0, 0, 0], # beda
               [0, 1/vmax7, 0, 0],
               [0, 0, 1, 0],
               [0, 0, 0, 1])
         
         H8 = []
 
-        for i in range(len(H7)):
-            P = H7[i]
+        for P in H7:
             Pv = ([P[0], P[1], P[2], 1])
             res = np.matmul(Pv, T8)
-            P8 = (res[0], res[1], res[2])
+            P8 = [res[0], res[1], res[2], res[3]]
             H8.append(P8)
             # print(P8)
 
@@ -415,11 +434,10 @@ class Application(tk.Frame):
         
         H9 = []
 
-        for i in range(len(H8)):
-            P = H8[i]
+        for P in H8:
             Pv = ([P[0], P[1], P[2], 1])
             res = np.matmul(Pv, T9)
-            P9 = (res[0], res[1], res[2])
+            P9 = [res[0], res[1], res[2], res[3]]
             H9.append(P9)
             # print(P9)
 
@@ -427,26 +445,24 @@ class Application(tk.Frame):
         
         for i in H9:
             p = list(i)
-            p[0] = p[0]/p[2]
-            p[1] = p[1]/p[2]
+            p[0] = p[0]/p[3]
+            p[1] = p[1]/p[3]
             Htest.append(p)
         
         
         H10 = []
-        for i in range(len(Htest)):
-            P = Htest[i]
+        for P in H9:
             Pv = ([P[0], P[1], P[2], 1])
             res = np.matmul(Pv, cs.pr2mat)
-            P10 = (res[0], res[1], res[2])
+            P10 = [res[0], res[1], res[2]]
             H10.append(P10)
             # print(P10)
         
         # drawing
 
         H10b = []
-        minusY = ([1, -1, 1])
-        for i in range(len(H9)):
-            P = H10[i]
+        minusY = ([1, 1, 1])
+        for P in Htest:
             res = cs.Scale(P, minusY)
             P10b = (res[0], res[1], res[2])
             H10b.append(P10b)
@@ -462,16 +478,30 @@ class Application(tk.Frame):
         w3 = (coc[0] + (wwidth / 2), coc[1] + (wheight / 2))
         w4 = (coc[0] - (wwidth / 2), coc[1] + (wheight / 2))
 
+        wvertices = []
+        wvertices.append(w1)
+        wvertices.append(w2)
+        wvertices.append(w3)
+        wvertices.append(w4)
+
+        wedges = []
+        wedges.append((wvertices[0], wvertices[1]))
+        wedges.append((wvertices[1], wvertices[2]))
+        wedges.append((wvertices[2], wvertices[3]))
+        wedges.append((wvertices[3], wvertices[0]))
+
         self.canvas.create_line(w1[0], w1[1], w2[0], w2[1])
         self.canvas.create_line(w2[0], w2[1], w3[0], w3[1])
         self.canvas.create_line(w3[0], w3[1], w4[0], w4[1])
         self.canvas.create_line(w4[0], w4[1], w1[0], w1[1])
 
         H11 = []
-        for p in H10b:
-            P = list(p)
-            P[0] *= coc[0] - 75
-            P[1] *= coc[1] - 75
+        for P in H10b:
+            P = list(P)
+            P[0] *= (wwidth / 2)
+            P[1] *= (wheight / 2)
+            # P[0] *= coc[0]
+            # P[1] *= coc[1]
             P[0] += coc[0]
             P[1] += coc[1]
             H11.append(P)
@@ -499,6 +529,11 @@ class Application(tk.Frame):
         for i, e in enumerate(Hedges11):
             p1 = e[0]
             p2 = e[1]
+            # clip outside window
+            newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, 'front', debug=False)
+            # print(newP1P2[0], newP1P2[1])
+            p1, p2 = newP1P2           
+            # until here
             # print(p1, p2)
             if(i < 5):
                 self.canvas.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
@@ -551,8 +586,10 @@ class Application(tk.Frame):
         # print('\nH8')
         # for i in H8:
         #     print(i)
-
-        # print('\nH9')
+        
+        # print('\n')
+        # print('COPz8L', COPz8)
+        # print('H9')
         # for i in H9:
         #     print(i)
         
@@ -571,6 +608,18 @@ class Application(tk.Frame):
         # print('\nHtest')
         # for i in Htest:
         #     print(i)
+
+        # Pr1a = np.matmul(np.matmul(np.matmul(A, T3), T4), T5)
+        # Pr1b = np.matmul(np.matmul(T7, T8), T9)
+        # print(Pr1a)
+        # print(Pr1b)
+        # for P in H:
+        #     Pv = ([P[0], P[1], P[2], 1])
+        #     res = np.matmul(np.matmul(Pv, Pr1a), Pr1b)
+        #     newP = list(res)
+        #     newP[0] /= newP[2]
+        #     newP[1] /= newP[2]
+        #     print(newP)
     
     def parallelProj(self):
         self.canvas2.delete('all') # ganti ini jadi canvas yg kedua
@@ -731,7 +780,7 @@ class Application(tk.Frame):
         H6 = []
         for i in range(len(Hedges)):
             housedge = Hedges[i]
-            res = cb.cyrusbeckv2(housedge[0], housedge[1], V, edges)
+            res = cb.cyrusbeckv2(housedge[0], housedge[1], V, edges, debug=False)
             tmp.append(res)
             if(i < 10):
                 H6.append(res[0])
@@ -816,6 +865,18 @@ class Application(tk.Frame):
         w3 = (coc[0] + (wwidth / 2), coc[1] + (wheight / 2))
         w4 = (coc[0] - (wwidth / 2), coc[1] + (wheight / 2))
 
+        wvertices = []
+        wvertices.append(w1)
+        wvertices.append(w2)
+        wvertices.append(w3)
+        wvertices.append(w4)
+
+        wedges = []
+        wedges.append((wvertices[0], wvertices[1]))
+        wedges.append((wvertices[1], wvertices[2]))
+        wedges.append((wvertices[2], wvertices[3]))
+        wedges.append((wvertices[3], wvertices[0]))
+
         self.canvas2.create_line(w1[0], w1[1], w2[0], w2[1])
         self.canvas2.create_line(w2[0], w2[1], w3[0], w3[1])
         self.canvas2.create_line(w3[0], w3[1], w4[0], w4[1])
@@ -853,6 +914,11 @@ class Application(tk.Frame):
         for i, e in enumerate(Hedges11):
             p1 = e[0]
             p2 = e[1]
+            # clip outside window
+            newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, 'front', debug=False)
+            # print(newP1P2[0], newP1P2[1])
+            p1, p2 = newP1P2           
+            # until here
             # print(p1, p2)
             if(i < 5):
                 self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=5) # ganti ini jadi kanvas kedua

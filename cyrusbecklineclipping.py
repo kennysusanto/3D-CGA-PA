@@ -254,18 +254,26 @@ def cyrusbeck(P1, P2, V, E, S):
 
     return P1res, P2res
 
-def cyrusbeckv2(P1, P2, V, E):
+def cyrusbeckv2(P1, P2, V, E, dir='right', debug=True):
     # P1 & P2 are the points of the line we'd like to clip
     # V is the vertices of the object
     # E is the edges of the object
 
     entering = []
     leaving = []
-    
-    A = ([P1[2], P1[1]])
-    B = ([P2[2], P2[1]])    
+
+    a = 0
+    r = 0
+
+    if(dir == 'right'):
+        A = ([P1[2], P1[1]])
+        B = ([P2[2], P2[1]])    
+    elif(dir == 'front'):
+        A = ([P1[0], P1[1]])
+        B = ([P2[0], P2[1]])    
 
     for e in E:
+
         ep1 = e[0]
         ep2 = e[1]
 
@@ -275,7 +283,14 @@ def cyrusbeckv2(P1, P2, V, E):
         dy = ep2[1] - ep1[1]
         dx = ep2[0] - ep1[0]
 
-        N = ([dy, -dx])
+        
+        if(dir == 'right'):
+            N = ([dy, -dx])
+        elif(dir == 'front'):
+            N = ([-dy, dx])
+        
+
+        
         # print('N: ' + str(N))
 
         P = ep2
@@ -290,12 +305,15 @@ def cyrusbeckv2(P1, P2, V, E):
         # if(f2 > 0): print('B is inside edge ' + str(i + 1))
         # elif(f2 < 0): print('B is outside edge ' + str(i + 1))
         # else: print('B is on edge ' + str(i + 1))
+        
     
         if(f > 0 and f2 > 0):
             # print('trivially accepted' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            a += 1
             pass
         elif(f < 0 and f2 < 0):
             # print('trivially rejected' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            r += 1
             pass
             # print(ep1, ep2)
         else:
@@ -348,41 +366,66 @@ def cyrusbeckv2(P1, P2, V, E):
             else:
                 # print('none of the above')
                 pass
+        if(debug == True):
+            print(f, f2)
+        
         
 
     # max t for entering = te
     # min t for leaving = tl
-
-    if(len(entering) < 1):
-        te = 0
-        tl = 1
-    elif(len(leaving) < 1):
-        te = 0
-        tl = 1
+    if(debug): print(r, a)
+    if(a == 4):
+        P1res = P1
+        P2res = P2
     else:
-        te = max(entering)
-        tl = min(leaving)
-
-    if(te <= tl):
-        # print('AB accepted')
-        pass
-        # print('A = ' + str(P1))
-        # print('B = ' + str(P2))
-        # print('A prime = ' + str(A))
-        # print('B prime = ' + str(B))
-        
-    elif(te > tl):
-        # print('AB rejected')
-        pass
-        # print('te: ' + str(te) + ' tl: ' + str(tl))
-    else:
-        # print('AB accepted no clipping')
-        pass
+        if(r > 0):
+            if(debug): print('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr', r)
+            entering.append(1)
+            leaving.append(0)
 
     
-    P1res = (P1[0], A[1], A[0])
-    P2res = (P2[0], B[1], B[0])
 
+        if(len(entering) < 1):
+            te = 0
+            tl = 1
+        elif(len(leaving) < 1):
+            te = 0
+            tl = 1
+        else:
+            te = max(entering)
+            tl = min(leaving)
+
+        if(te <= tl):
+            # print('AB accepted')
+            pass
+            # print('A = ' + str(P1))
+            # print('B = ' + str(P2))
+            # print('A prime = ' + str(A))
+            # print('B prime = ' + str(B))
+            if(dir == 'right'):
+                P1res = (P1[0], A[1], A[0])
+                P2res = (P2[0], B[1], B[0])
+            elif(dir == 'front'):
+                P1res = (A[0], A[1], P1[2])
+                P2res = (B[0], B[1], P2[2])
+
+            
+        elif(te > tl):
+            
+            P1res = P1
+            P2res = P1
+            if(debug): print('not drawn')
+            # print('AB rejected')
+            pass
+            # print('te: ' + str(te) + ' tl: ' + str(tl))
+        else:
+            # print('AB accepted no clipping')
+            pass
+
+    
+        
+    if(debug): print(P1res, P2res)
+    
     return P1res, P2res
 
 # P3 = (0, 0, -math.sqrt(2))
