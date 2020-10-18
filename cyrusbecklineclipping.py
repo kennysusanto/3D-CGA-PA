@@ -45,11 +45,18 @@ P2 = (3, 1, 1)
 # N vector is (-dy, dx) for left and (dy, -dx) for right
 
 # parametric line equation C = A + t * (B - A)
-def parametriclineequation(A, B, t):
-    Cx = A[0] + (t * (B[0] - A[0]))
-    Cy = A[1] + (t * (B[1] - A[1]))
-    C = (Cx, Cy)
-    return C
+def parametriclineequation(A, B, t, mode='2d'):
+    if(mode == '2d'):
+        Cx = A[0] + (t * (B[0] - A[0]))
+        Cy = A[1] + (t * (B[1] - A[1]))
+        C = [Cx, Cy]
+        return C
+    elif(mode == '3d'):
+        Cx = A[0] + (t * (B[0] - A[0]))
+        Cy = A[1] + (t * (B[1] - A[1]))
+        Cz = A[2] + (t * (B[2] - A[2]))
+        C = [Cx, Cy, Cz]
+        return C
 
 # t
 def findt(A, B, P, N):
@@ -60,199 +67,196 @@ def findt(A, B, P, N):
     return t
 
 
-def cyrusbeck(P1, P2, V, E, S):
+def cyrusbeck3d(P1, P2, S, debug=True):
     # P1 & P2 are the points of the line we'd like to clip
-    # V is the vertices of the object
-    # E is the edges of the object
-    # S is the surfaces of the object
-    # urutan surface = front, back, top, bottom, left, right (dilihat dari z+)
+    # S is the surfaces of the clipping object (counter-clockwise)
+    Sref = ['front', 'back', 'left', 'right', 'top', 'bottom']
+
+    planeNormals = ([0, 0, -1],  # front
+                    [0, 0, 1],   # back
+                    [1, 0, -1],  # left
+                    [-1, 0, -1], # right
+                    [0, -1, -1], # top
+                    [0, 1, -1])  # bottom
+
+    planeNormalsi = ([0, 0, 1],  # front
+                    [0, 0, 1],   # back
+                    [-1, 0, 1],  # left
+                    [1, 0, 1], # right
+                    [0, 1, 1], # top
+                    [0, -1, 1])  # bottom
 
     res = []
 
-    for s in range(len(S)):
-        surfaceedges = S[s]
+    r = 0
+    a = 0
+
+    A = ([P1[0], P1[1], P1[2]])
+    B = ([P2[0], P2[1], P2[2]])
+
+    for idx, s in enumerate(S):
+        # for every surface
+        edges = s
+        if(debug): print('surface: ' + Sref[idx])
 
         entering = []
         leaving = []
         
-        A = None
-        B = None
-
-        surfacedict = {0:'front', 1:'back', 2:'top', 3:'bottom', 4:'left', 5:'right'}
-
-        # print('\nsurface: ' + surfacedict[s])
-
-        if(s == 0):
-            # front (x, y)
-            A = ([P1[0], P1[1]])
-            B = ([P2[0], P2[1]])
-        elif(s == 1):
-            # back the same as front
-            continue
-        elif(s == 2): 
-            # top (x, z)
-            A = ([P1[0], -P1[2]])
-            B = ([P2[0], -P2[2]])
-        elif(s == 3):
-            # bottom same as top
-            continue
-        elif(s == 4):
-            # left (z, y)
-            A = ([P1[2], P1[1]])
-            B = ([P2[2], P2[1]])
-        elif(s == 5):
-            # right same as left
-            continue
-
         
-
-        for i in range(len(surfaceedges)):
-            e = surfaceedges[i]
-            ep1 = e[0]
-            ep2 = e[1]
-
-            if(s == 0):
-                # front (x, y)
-                ep1 = (ep1[0], ep1[1])
-                ep2 = (ep2[0], ep2[1])
-            elif(s == 1):
-                # back the same as front
-                continue
-            elif(s == 2): 
-                # top (x, z)
-                ep1 = (ep1[0], -ep1[2])
-                ep2 = (ep2[0], -ep2[2])
-            elif(s == 3):
-                # bottom same as top
-                continue
-            elif(s == 4):
-                # left (z, y)
-                ep1 = (ep1[2], ep1[1])
-                ep2 = (ep2[2], ep2[1])
-            elif(s == 5):
-                # right same as left
-                continue
-            
-
-            dy = ep2[1] - ep1[1]
-            dx = ep2[0] - ep1[0]
-
-            N = ([dy, -dx])
-            # print('N: ' + str(N))
-
-            P = ep2
-
-            f = np.matmul(np.subtract(A, P), N)
-            # if(f > 0): print('A is inside edge ' + str(i + 1))
-            # elif(f < 0): print('A is outside edge ' + str(i + 1))
-            # else: print('A is on edge ' + str(i + 1))
-
-            f2 = np.matmul(np.subtract(B, P), N)
-            # if(f2 > 0): print('B is inside edge ' + str(i + 1))
-            # elif(f2 < 0): print('B is outside edge ' + str(i + 1))
-            # else: print('B is on edge ' + str(i + 1))
         
-            if(f > 0 and f2 > 0):
-                # print('trivially accepted' + ' f: ' + str(f) + ' f2: ' + str(f2))
-                pass
-            elif(f < 0 and f2 < 0):
-                # print('trivially rejected' + ' f: ' + str(f) + ' f2: ' + str(f2))
-                pass
-                # print(ep1, ep2)
-            else:
-                # print('perform clipping' + ' f: ' + str(f) + ' f2: ' + str(f2))
-                pass
+        N = planeNormals[idx]
+        # print('N: ' + str(N))
 
-                if(f < 0 and f2 > 0):
-                    # print('entering')
+        P = edges[0][1] # second vertex in first edge
+        P = ([P[0], P[1], P[2]])
 
-                    t = findt(A, B, P, N)
+        f = np.matmul(np.subtract(A, P), N)
+        # if(f > 0): print('A is inside edge ' + str(i + 1))
+        # elif(f < 0): print('A is outside edge ' + str(i + 1))
+        # else: print('A is on edge ' + str(i + 1))
 
-                    # print('t found at: ' + str(t))
-                    entering.append(t)
-
-                    C = parametriclineequation(A, B, t)
-                    # print('entering ' + str(C))
-                    # if(N[0] != 0):
-                    #     C = (A[0], C[1] )
-                    # elif(N[1] != 0):
-                    #     C = (C[0], A[1])
-                    
-                    Cv = ([C[0], C[1]])
-                    A = Cv
-                    # enteringC.append(C)
-                    # print(A)
-                    # print(B)
-                elif(f > 0 and f2 < 0):
-                    # print('leaving')
-
-                    t = findt(A, B, P, N)
-
-                    # print('t found at: ' + str(t))
-                    leaving.append(t)
-
-                    C = parametriclineequation(A, B, t)
-                    # print('leaving ' + str(C))
-                    # if(N[0] != 0):
-                    #     C = (B[0], C[1])
-                    # elif(N[1] != 0):
-                    #     C = (C[0], B[1])
-
-                    Cv = ([C[0], C[1]])
-                    B = Cv
-                    # leavingC.append(C)
-                    # print(A)
-                    # print(B)
-                elif(f == 0 or f2 == 0):
-                    # print('on edge')
-                    pass
-                else:
-                    # print('none of the above')
-                    pass
+        f2 = np.matmul(np.subtract(B, P), N)
+        # if(f2 > 0): print('B is inside edge ' + str(i + 1))
+        # elif(f2 < 0): print('B is outside edge ' + str(i + 1))
+        # else: print('B is on edge ' + str(i + 1))
+    
+        if(f > 0 and f2 > 0):
+            # print('trivially accepted' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            if(debug): print('trivially accepted')
             
-
-        # max t for entering = te
-        # min t for leaving = tl
-
-        if(len(entering) < 1):
-            te = 0
-            tl = 1
-        elif(len(leaving) < 1):
-            te = 0
-            tl = 1
+            
+        elif(f < 0 and f2 < 0):
+            # print('trivially rejected' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            if(debug): print('trivially rejected', f, f2)
+            P1res = np.multiply(P1, 100)
+            P2res = np.multiply(P2, 100)
+            # P1res = P1
+            # P2res = P2
+            return P1res, P2res
+            # print(ep1, ep2)
         else:
-            te = max(entering)
-            tl = min(leaving)
+            # print('perform clipping' + ' f: ' + str(f) + ' f2: ' + str(f2))
+            
+
+            if(f < 0 and f2 > 0):
+                # print('entering')
+
+                t = findt(A, B, P, N)
+
+                # print('t found at: ' + str(t))
+                entering.append(t)
+
+                C = parametriclineequation(A, B, t, '3d')
+                # print('entering ' + str(C))
+                # if(N[0] != 0):
+                #     C = (A[0], C[1] )
+                # elif(N[1] != 0):
+                #     C = (C[0], A[1])
+                
+                Cv = ([C[0], C[1], C[2]])
+                A = Cv
+                # enteringC.append(C)
+                # print(A)
+                # print(B)
+                if(debug): print('entering', t, Cv)
+            elif(f > 0 and f2 < 0):
+                # print('leaving')
+
+                t = findt(A, B, P, N)
+
+                # print('t found at: ' + str(t))
+                leaving.append(t)
+
+                C = parametriclineequation(A, B, t, '3d')
+                # print('leaving ' + str(C))
+                # if(N[0] != 0):
+                #     C = (B[0], C[1])
+                # elif(N[1] != 0):
+                #     C = (C[0], B[1])
+
+                Cv = ([C[0], C[1], C[2]])
+                B = Cv
+                # leavingC.append(C)
+                # print(A)
+                # print(B)
+                if(debug): print('leaving', t, Cv)
+            elif(f == 0):
+                if(debug): print('A on plane')
+                if(f2 == 0 or f2 > 0):
+                    pass
+                elif(f2 < 0):
+                    t = findt(A, B, P, N)
+                    C = parametriclineequation(A, B, t, '3d')
+                    Cv = ([C[0], C[1], C[2]])
+                    B = Cv
+            elif(f2 == 0):
+                if(debug): print('B on plane')
+                if(f == 0 or f > 0):
+                    pass
+                elif(f < 0):
+                    t = findt(A, B, P, N)
+                    C = parametriclineequation(A, B, t, '3d')
+                    Cv = ([C[0], C[1], C[2]])
+                    A = Cv
+            else:
+                # print('none of the above')
+                pass
+        
+        if(debug): print(f, f2)
+
+
+    # max t for entering = te
+    # min t for leaving = tl
+
+    if(len(entering) < 1):
+        P1res = A
+        P2res = B
+        if(debug): 
+            print(f'P1: {P1}')
+            print(f'P2: {P2}')
+            print(f'P1 prime: {P1res}')
+            print(f'P2 prime: {P2res}')
+        return P1res, P2res
+
+    elif(len(leaving) < 1):
+        P1res = A
+        P2res = B
+        if(debug): 
+            print(f'P1: {P1}')
+            print(f'P2: {P2}')
+            print(f'P1 prime: {P1res}')
+            print(f'P2 prime: {P2res}')
+        return P1res, P2res
+
+    else:
+        te = max(entering)
+        tl = min(leaving)
 
         if(te <= tl):
-            # print('AB accepted')
-            pass
-            # print('A = ' + str(P1))
-            # print('B = ' + str(P2))
-            # print('A prime = ' + str(A))
-            # print('B prime = ' + str(B))
-            res.append((A, B))
+            P1res = A
+            P2res = B
+
         elif(te > tl):
             # print('AB rejected')
-            pass
+            P1res = P1
+            P2res = P2
             # print('te: ' + str(te) + ' tl: ' + str(tl))
         else:
             # print('AB accepted no clipping')
-            pass
+            P1res = A
+            P2res = B
+        
+        if(debug): 
+            print(f'P1: {P1}')
+            print(f'P2: {P2}')
+            print(f'P1 prime: {P1res}')
+            print(f'P2 prime: {P2res}')
+        return P1res, P2res
 
     
-    frontres = res[0]
-    # print('xy', frontres)
-    topres = res[1]
-    # print('xz-', topres)
-    leftres = res[2]
-    # print('zy', leftres)
-    P1res = (topres[0][0], leftres[0][1], -topres[0][1])
-    # print('P1 prime:', P1res)
-    P2res = (topres[1][0], frontres[1][1], -topres[1][1])
-    # print('P2 prime:', P2res)
+    
 
-    return P1res, P2res
+    
 
 def cyrusbeckv2(P1, P2, V, E, dir='right', debug=True):
     # P1 & P2 are the points of the line we'd like to clip

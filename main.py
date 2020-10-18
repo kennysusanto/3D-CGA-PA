@@ -185,17 +185,6 @@ class Application(tk.Frame):
         self.parallelProj()
 
     def theboringhouse(self):
-        # absval = 5
-        # V = []
-        # V[0] = [-absval, absval, absval]
-        # V[1] = [absval, absval, absval]
-        # V[2] = [absval, -absval, absval]
-        # V[3] = [-absval, -absval, absval]
-        # V[4] = [-absval, absval, -absval]
-        # V[5] = [absval, absval, -absval]
-        # V[6] = [absval, -absval, -absval]
-        # V[7] = [-absval, -absval, -absval]
-
         H = []
         val = 1
         H.append([-val, -val, val])  # A
@@ -209,11 +198,30 @@ class Application(tk.Frame):
         H.append([0, val, -val])   # I
         H.append([-val, 0, -val])  # J
 
-        return H
+        Hedges = [] # house / object edges
+        Hedges.append([H[0], H[1]])   # edge 0
+        Hedges.append([H[1], H[2]])   # edge 1
+        Hedges.append([H[2], H[3]])   # edge 2
+        Hedges.append([H[3], H[4]])   # edge 3
+        Hedges.append([H[4], H[0]])   # edge 4
+        
+        Hedges.append([H[5], H[6]])   # edge 5
+        Hedges.append([H[6], H[7]])   # edge 6
+        Hedges.append([H[7], H[8]])   # edge 7
+        Hedges.append([H[8], H[9]])   # edge 8
+        Hedges.append([H[9], H[5]])   # edge 9
+
+        Hedges.append([H[0], H[5]])   # edge 10
+        Hedges.append([H[1], H[6]])   # edge 11
+        Hedges.append([H[2], H[7]])   # edge 12
+        Hedges.append([H[3], H[8]])   # edge 13
+        Hedges.append([H[4], H[9]])   # edge 14
+
+        return Hedges
 
     def perspectiveProj(self):
         self.canvas.delete('all')
-        H = self.theboringhouse()
+        Hedges = self.theboringhouse()
 
         VRP = ([float(self.vrpx.get()), float(self.vrpy.get()), float(self.vrpz.get())])
         VPN = ([float(self.vpnx.get()), float(self.vpny.get()), float(self.vpnz.get())])
@@ -253,14 +261,6 @@ class Application(tk.Frame):
         F = fp
         B = -bp
 
-        H2 = []
-
-        for P in H:
-            Pv = ([P[0], P[1], P[2], 1])
-            res = np.matmul(Pv, A)
-            P2 = [res[0], res[1], res[2]]
-            H2.append(P2)
-
         CW = ([(umax + umin)/2, (vmax + vmin)/2, 0])
         DOP = np.subtract(CW, COP)
         
@@ -274,12 +274,6 @@ class Application(tk.Frame):
               [0, 1, 0, 0],
               [0, 0, 1, 0],
               [-COP[0], -COP[1], -COP[2], 1])
-        
-        H3 = []
-        for P in H2:
-            res = cs.Translate(P, COP)
-            P3 = [res[0], res[1], res[2]]
-            H3.append(P3)
 
         F3 = F - COPz
         B3 = B - COPz
@@ -289,108 +283,78 @@ class Application(tk.Frame):
               [shx, shy, 1, 0],
               [0, 0, 0, 1])
 
-        H4 = []
-        for P in H3:
-            Pv = ([P[0], P[1], P[2], 1])
-            res = np.matmul(Pv, T4)
-            P4 = [res[0], res[1], res[2]]
-            H4.append(P4)
-            # print(P4)
-
-        
-        
-
         BP4 = B - COPz
         VP4 = -COPz
 
-        h = ((B - COPz) * (vmax - vmin)) / (2 * COPz)
+        h = ((COPz - B) * (vmax - vmin)) / (2 * COPz)
         w = ((COPz - B) * (umax - umin)) / (2 * COPz)
 
-        T5s = ([1/w, 1/h, (1/BP4)]) # beda
-        T5 = ([1/w, 0, 0, 0],
+        T5 = ([-1/w, 0, 0, 0],      # beda
               [0, 1/h, 0, 0],
               [0, 0, -(1/BP4), 0],
               [0, 0, 0, 1])
 
-        H5 = []
-        for P in H4:
-            res = cs.Scale(P, T5s)
-            P5 = [res[0], res[1], res[2]]
-            H5.append(P5)
-            # print(P5)
-
-                
-        # T6 clipping not yet implemented
-        # print('\n')
-
-        Hedges = []
-        Hedges.append((H5[0], H5[1]))
-        Hedges.append((H5[1], H5[2]))
-        Hedges.append((H5[2], H5[3]))
-        Hedges.append((H5[3], H5[4]))
-        Hedges.append((H5[4], H5[0]))
+        Pr1a = np.matmul(np.matmul(np.matmul(A, T3), T4), T5)
+        Hedges1 = []
+        for e in Hedges:
+            tmpe = []
+            for p in e:
+                p = list(p)
+                pv = ([p[0], p[1], p[2], 1])
+                res = np.matmul(pv, Pr1a)
+                tmpe.append(res)
+            Hedges1.append(tmpe)
         
-        Hedges.append((H5[5], H5[6]))
-        Hedges.append((H5[6], H5[7]))
-        Hedges.append((H5[7], H5[8]))
-        Hedges.append((H5[8], H5[9]))
-        Hedges.append((H5[9], H5[5]))
+        # T6 clipping
 
-        Hedges.append((H5[0], H5[5]))
-        Hedges.append((H5[1], H5[6]))
-        Hedges.append((H5[2], H5[7]))
-        Hedges.append((H5[3], H5[8]))
-        Hedges.append((H5[4], H5[9]))
+        V = [] # view volume vertices
+        F5 = (F - COPz) / (COPz - B)
+        # print('F5:', F5)
+        V.append((0, 0, F5))         # vertex 0
+        V.append((0, 0, F5))         # vertex 1
+        V.append((0, 0, F5))         # vertex 2
+        V.append((0, 0, F5))         # vertex 3
+        V.append((-1, 1, -1))       # vertex 4
+        V.append((1, 1, -1))        # vertex 5
+        V.append((1, -1, -1))       # vertex 6
+        V.append((-1, -1, -1))      # vertex 7
 
-        V = []
-        V.append((fp, vmax))
-        V.append((-bp, vmax))
-        V.append((-bp, vmin))
-        V.append((fp, vmin))
-        # V.append((umin, vmax, F))
-        # V.append((umax, vmax, F))
-        # V.append((umax, vmin, F))
-        # V.append((umin, vmin, F))
-        # V.append((umin, vmax, B))
-        # V.append((umax, vmax, B))
-        # V.append((umax, vmin, B))
-        # V.append((umin, vmin, B))
+        edges = [] # view volume edges (counter-clockwise based on the axis of the surface)
+        edges.append((V[3], V[2]))  # edge 0
+        edges.append((V[2], V[1]))  # edge 1
+        edges.append((V[1], V[0]))  # edge 2
+        edges.append((V[0], V[3]))  # edge 3
 
-        edges = []
-        edges.append((V[3], V[0]))
-        edges.append((V[1], V[2]))
-        # edges.append((V[0], V[1])) # edge 0
-        # edges.append((V[1], V[2])) # edge 1
-        # edges.append((V[2], V[3])) # edge 2
-        # edges.append((V[3], V[0])) # edge 3
+        edges.append((V[6], V[7]))  # edge 4
+        edges.append((V[7], V[4]))  # edge 5
+        edges.append((V[4], V[5]))  # edge 6
+        edges.append((V[5], V[6]))  # edge 7
 
-        # edges.append((V[4], V[5])) # edge 4
-        # edges.append((V[5], V[6])) # edge 5
-        # edges.append((V[6], V[7])) # edge 6
-        # edges.append((V[7], V[4])) # edge 7
+        edges.append((V[0], V[4]))  # edge 8
+        edges.append((V[1], V[5]))  # edge 9
+        edges.append((V[2], V[6]))  # edge 10
+        edges.append((V[3], V[7]))  # edge 11
 
-        # edges.append((V[0], V[4])) # edge 8
-        # edges.append((V[1], V[5])) # edge 9
-        # edges.append((V[2], V[6])) # edge 10
-        # edges.append((V[3], V[7])) # edge 11
-
-        # surfaces = []
-        # surfaces.append((edges[0], edges[1], edges[2], edges[3])) # front
-        # surfaces.append((edges[4], edges[5], edges[6], edges[7])) # back
-        # surfaces.append((edges[4], (V[5], V[1]), (V[1], V[0]), edges[8])) # top
-        # surfaces.append(((V[7], V[6]), (V[6], V[2]), edges[2], edges[11])) # bottom
-        # surfaces.append(((V[4], V[0]), (V[0], V[3]), edges[11], edges[7])) # left
-        # surfaces.append(((V[5], V[1]), edges[1], edges[10], (V[6], V[5]))) # right
-
-        tmp = []
-        H6 = []
-        for i, edge in enumerate(Hedges):
-            # print(i)
-            res = cb.cyrusbeckv2(edge[0], edge[1], V, edges, debug=False)
-            tmp.append(res)
-            if(i < 10):
-                H6.append(res[0])
+        surfaces = [] # view volume surfaces (counter-clockwise based on the axis of the surface)
+        surfaces.append((edges[0], edges[1], edges[2], edges[3]))               # front
+        # surfaces.append(((V[0], V[1]), (V[1], V[2]), (V[2], V[3]), (V[3], V[0])))
+        surfaces.append((edges[4], edges[5], edges[6], edges[7]))               # back
+        surfaces.append(((V[7], V[3]), (V[3], V[0]), edges[8], (V[4], V[7])))   # left
+        surfaces.append((edges[10], (V[6], V[5]), (V[5], V[1]), (V[1], V[2])))  # right
+        surfaces.append(((V[0], V[1]), edges[9], (V[5], V[4]), (V[4], V[0])))   # top
+        surfaces.append(((V[7], V[6]), (V[6], V[2]), (V[2], V[3]), edges[11]))  # bottom
+        
+        Hedges2 = []
+        for i, edge in enumerate(Hedges1):
+            # print(f'\nedge: {i}')
+            res = cb.cyrusbeck3d(edge[0], edge[1], surfaces, debug=False)
+            if(res is not None):
+                Hedges2.append(res)
+            else:
+                pass
+            
             # print(res)
+        
         
         VP5 = COPz / (B - COPz)
         T7t = ([0, 0, VP5]) # beda
@@ -399,17 +363,8 @@ class Application(tk.Frame):
               [0, 0, 1, 0],
               [0, 0, -VP5, 1])
 
-        H7 = []
-        for P in H6:
-            res = cs.Translate(P, T7t)
-            P7 = [res[0], res[1], res[2]]
-            H7.append(P7)
-            # print(P7)
-
-        
         vmax7 = COPz / (B - COPz)
 
-        
         umax7 = COPz / (COPz - B)
 
         T8 = ([1/vmax7, 0, 0, 0], # beda
@@ -417,55 +372,30 @@ class Application(tk.Frame):
               [0, 0, 1, 0],
               [0, 0, 0, 1])
         
-        H8 = []
-
-        for P in H7:
-            Pv = ([P[0], P[1], P[2], 1])
-            res = np.matmul(Pv, T8)
-            P8 = [res[0], res[1], res[2], res[3]]
-            H8.append(P8)
-            # print(P8)
-
         COPz8 = COPz / (COPz - B)
         T9 = ([1, 0, 0, 0],
               [0, 1, 0, 0],
               [0, 0, 1, -(1 / COPz8)],
               [0, 0, 0, 1])
         
-        H9 = []
-
-        for P in H8:
-            Pv = ([P[0], P[1], P[2], 1])
-            res = np.matmul(Pv, T9)
-            P9 = [res[0], res[1], res[2], res[3]]
-            H9.append(P9)
-            # print(P9)
-
-        Htest = []
-        
-        for i in H9:
-            p = list(i)
-            p[0] = p[0]/p[3]
-            p[1] = p[1]/p[3]
-            Htest.append(p)
-        
-        
-        H10 = []
-        for P in H9:
-            Pv = ([P[0], P[1], P[2], 1])
-            res = np.matmul(Pv, cs.pr2mat)
-            P10 = [res[0], res[1], res[2]]
-            H10.append(P10)
-            # print(P10)
+        Hedges3 = []
+        Pr1b = np.matmul(np.matmul(T7, T8), T9)
+        for e in Hedges2:
+            tmpe = []
+            for p in e:
+                p = list(p)
+                pv = ([p[0], p[1], p[2], 1])
+                res = np.matmul(pv, Pr1b)
+                p = res
+                if(p[3] == 0):
+                    pass
+                else:
+                    p[0] = p[0]/p[3]
+                    p[1] = p[1]/p[3]
+                tmpe.append(p)
+            Hedges3.append(tmpe)
         
         # drawing
-
-        H10b = []
-        minusY = ([1, 1, 1])
-        for P in Htest:
-            res = cs.Scale(P, minusY)
-            P10b = (res[0], res[1], res[2])
-            H10b.append(P10b)
         
         cwidth = self.canvas.winfo_width()
         cheight = self.canvas.winfo_height()
@@ -495,135 +425,33 @@ class Application(tk.Frame):
         self.canvas.create_line(w3[0], w3[1], w4[0], w4[1])
         self.canvas.create_line(w4[0], w4[1], w1[0], w1[1])
 
-        H11 = []
-        for P in H10b:
-            P = list(P)
-            P[0] *= (wwidth / 2)
-            P[1] *= (wheight / 2)
-            # P[0] *= coc[0]
-            # P[1] *= coc[1]
-            P[0] += coc[0]
-            P[1] += coc[1]
-            H11.append(P)
-            # print(P)
+        Hedges4 = []
+        for e in Hedges3:
+            tmpe = []
+            for p in e:
+                p = list(p)
+                p[0] *= (wwidth / 2)
+                p[1] *= (wheight / 2) 
+                p[0] += coc[0]
+                p[1] += coc[1]
+                tmpe.append(p)
+            Hedges4.append(tmpe)
         
-        Hedges11 = []
-        Hedges11.append((H11[0], H11[1]))
-        Hedges11.append((H11[1], H11[2]))
-        Hedges11.append((H11[2], H11[3]))
-        Hedges11.append((H11[3], H11[4]))
-        Hedges11.append((H11[4], H11[0]))
-        
-        Hedges11.append((H11[5], H11[6]))
-        Hedges11.append((H11[6], H11[7]))
-        Hedges11.append((H11[7], H11[8]))
-        Hedges11.append((H11[8], H11[9]))
-        Hedges11.append((H11[9], H11[5]))
-
-        Hedges11.append((H11[0], H11[5]))
-        Hedges11.append((H11[1], H11[6]))
-        Hedges11.append((H11[2], H11[7]))
-        Hedges11.append((H11[3], H11[8]))
-        Hedges11.append((H11[4], H11[9]))
-        
-        for i, e in enumerate(Hedges11):
+        for i, e in enumerate(reversed(Hedges4)):
+            
             p1 = e[0]
             p2 = e[1]
             # clip outside window
             newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, 'front', debug=False)
-            # print(newP1P2[0], newP1P2[1])
-            p1, p2 = newP1P2           
-            # until here
-            # print(p1, p2)
-            if(i < 5):
+            p1, p2 = newP1P2        
+            if(i > 9):
                 self.canvas.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
             else:
                 self.canvas.create_line(p1[0], p1[1], p2[0], p2[1],fill="black",width=2.5)
-
-        # print('\n')
-        # print(VRP)
-        # print(N, v, u)
-        # print('\nH1')
-        # for i in H:
-        #     print(i)
-        
-        # print('\nH2')
-        # for i in H2:
-        #     print(i)
-
-        # print('\nH3')
-        # for i in H3:
-        #     print(i)
-
-        # print('\n')
-        # print(DOP)
-        # print(shx, shy)
-        # print('\nH4')
-        # for i in H4:
-        #     print(i)
-
-        # print('\n')
-        # print('w', w, 1/w)
-        # print('h', h, 1/h)
-        # print('bp4', BP4, -(1/BP4))
-        # print('\nH5')
-        # for i in H5:
-        #     print(i)
-
-        # print('\nH6')
-        # for i in H6:
-        #     print(i)
-
-        # print('\nH7')
-        # for i in H7:
-        #     print(i)
-        
-        # print('\n')
-        # print(B, COPz)
-        # print(B-COPz, COPz-B)
-        # print(umax7, vmax7)
-        # print(1/umax7, 1/vmax7)
-        # print('\nH8')
-        # for i in H8:
-        #     print(i)
-        
-        # print('\n')
-        # print('COPz8L', COPz8)
-        # print('H9')
-        # for i in H9:
-        #     print(i)
-        
-        # print('\nH10')
-        # for i in H10:
-        #     print(i)
-        
-        # print('\nH10b')
-        # for i in H10b:
-        #     print(i)
-        
-        # print('\nH11')
-        # for i in H11:
-        #     print(i)
-        
-        # print('\nHtest')
-        # for i in Htest:
-        #     print(i)
-
-        # Pr1a = np.matmul(np.matmul(np.matmul(A, T3), T4), T5)
-        # Pr1b = np.matmul(np.matmul(T7, T8), T9)
-        # print(Pr1a)
-        # print(Pr1b)
-        # for P in H:
-        #     Pv = ([P[0], P[1], P[2], 1])
-        #     res = np.matmul(np.matmul(Pv, Pr1a), Pr1b)
-        #     newP = list(res)
-        #     newP[0] /= newP[2]
-        #     newP[1] /= newP[2]
-        #     print(newP)
     
     def parallelProj(self):
-        self.canvas2.delete('all') # ganti ini jadi canvas yg kedua
-        H = self.theboringhouse()
+        self.canvas2.delete('all')
+        Hedges = self.theboringhouse()
 
         VRP = ([float(self.vrpx.get()), float(self.vrpy.get()), float(self.vrpz.get())])
         VPN = ([float(self.vpnx.get()), float(self.vpny.get()), float(self.vpnz.get())])
@@ -650,17 +478,18 @@ class Application(tk.Frame):
 
         u = np.cross(v, N)
 
-        H2 = []
+        r = ([VRP[0], VRP[1], VRP[2]])
 
-        for i in range(len(H)):
-            P = H[i]
-            Pv = ([P[0], P[1], P[2]])
-            a = np.dot(np.subtract(Pv, VRP), u)
-            b = np.dot(np.subtract(Pv, VRP), v)
-            c = np.dot(np.subtract(Pv, VRP), N)
-            P2 = (a, b, c)
-            H2.append(P2)
+        rp = ([np.dot(np.negative(r), u), np.dot(np.negative(r), v), np.dot(np.negative(r), N)])
 
+        A = ([u[0], v[0], N[0], 0],
+             [u[1], v[1], N[1], 0],
+             [u[2], v[2], N[2], 0],
+             [rp[0], rp[1], rp[2], 1])
+
+        COPz = COP[2]
+        F = fp
+        B = -bp
 
         CW = ([(umax + umin)/2, (vmax + vmin)/2, 0])
         DOP = np.subtract(CW, COP)
@@ -670,190 +499,34 @@ class Application(tk.Frame):
         DOPz = DOP[2]
         shx = -(DOPx/DOPz)
         shy = -(DOPy/DOPz)
-        
-        H3 = []
-        for i in range(len(H2)):
-            P = H2[i]
-            res = cs.Translate(P, COP)
-            P3 = (res[0], res[1], res[2])
-            H3.append(P3)
 
-        T4 = ([1, 0, 0, 0],
+        T3 = ([1, 0, 0, 0],
               [0, 1, 0, 0],
               [shx, shy, 1, 0],
               [0, 0, 0, 1])
 
-        H4 = []
-        for i in range(len(H3)):
-            P = H3[i]
-            Pv = ([P[0], P[1], P[2], 1])
-            res = np.matmul(Pv, T4)
-            P4 = (res[0], res[1], res[2])
-            H4.append(P4)
-            # print(P4)
-
-        F = fp
-        B = -bp
-
-        COPz = COP[2]
-        BP4 = B - COPz
-        VP4 = -COPz
-
-        h = ((COPz - B) * (vmax - vmin)) / (2 * COPz)
-        w = ((B - COPz) * (umax - umin)) / (2 * COPz)
-
-        T5 = ([1/w, 1/h, -(1/BP4)])
-
-        H5 = []
-        for i in range(len(H4)):
-            res = cs.Scale(H4[i], T5)
-            P5 = (res[0], res[1], res[2])
-            H5.append(P5)
-            # print(P5)
-
-                
-        # T6 clipping not yet implemented
-        # print('\n')
-
-        Hedges = []
-        Hedges.append((H5[0], H5[1]))
-        Hedges.append((H5[1], H5[2]))
-        Hedges.append((H5[2], H5[3]))
-        Hedges.append((H5[3], H5[4]))
-        Hedges.append((H5[4], H5[0]))
-        
-        Hedges.append((H5[5], H5[6]))
-        Hedges.append((H5[6], H5[7]))
-        Hedges.append((H5[7], H5[8]))
-        Hedges.append((H5[8], H5[9]))
-        Hedges.append((H5[9], H5[5]))
-
-        Hedges.append((H5[0], H5[5]))
-        Hedges.append((H5[1], H5[6]))
-        Hedges.append((H5[2], H5[7]))
-        Hedges.append((H5[3], H5[8]))
-        Hedges.append((H5[4], H5[9]))
-
-        V = []
-        V.append((fp, vmax))
-        V.append((bp, vmax))
-        V.append((bp, -vmin))
-        V.append((fp, -vmin))
-        # V.append((umin, vmax, F))
-        # V.append((umax, vmax, F))
-        # V.append((umax, vmin, F))
-        # V.append((umin, vmin, F))
-        # V.append((umin, vmax, B))
-        # V.append((umax, vmax, B))
-        # V.append((umax, vmin, B))
-        # V.append((umin, vmin, B))
-
-        edges = []
-        edges.append((V[0], V[1]))
-        edges.append((V[1], V[2]))
-        edges.append((V[2], V[3]))
-        edges.append((V[3], V[0]))
-        # edges.append((V[0], V[1])) # edge 0
-        # edges.append((V[1], V[2])) # edge 1
-        # edges.append((V[2], V[3])) # edge 2
-        # edges.append((V[3], V[0])) # edge 3
-
-        # edges.append((V[4], V[5])) # edge 4
-        # edges.append((V[5], V[6])) # edge 5
-        # edges.append((V[6], V[7])) # edge 6
-        # edges.append((V[7], V[4])) # edge 7
-
-        # edges.append((V[0], V[4])) # edge 8
-        # edges.append((V[1], V[5])) # edge 9
-        # edges.append((V[2], V[6])) # edge 10
-        # edges.append((V[3], V[7])) # edge 11
-
-        # surfaces = []
-        # surfaces.append((edges[0], edges[1], edges[2], edges[3])) # front
-        # surfaces.append((edges[4], edges[5], edges[6], edges[7])) # back
-        # surfaces.append((edges[4], (V[5], V[1]), (V[1], V[0]), edges[8])) # top
-        # surfaces.append(((V[7], V[6]), (V[6], V[2]), edges[2], edges[11])) # bottom
-        # surfaces.append(((V[4], V[0]), (V[0], V[3]), edges[11], edges[7])) # left
-        # surfaces.append(((V[5], V[1]), edges[1], edges[10], (V[6], V[5]))) # right
-
-        tmp = []
-        H6 = []
-        for i in range(len(Hedges)):
-            housedge = Hedges[i]
-            res = cb.cyrusbeckv2(housedge[0], housedge[1], V, edges, debug=False)
-            tmp.append(res)
-            if(i < 10):
-                H6.append(res[0])
-            # print(res)
-        
-        VP5 = COPz / (B - COPz)
-        T7 = ([0, 0, -VP5])
-
-        H7 = []
-        for i in range(len(H6)):
-            P = H6[i]
-            res = cs.Translate(P, T7)
-            P7 = (res[0], res[1], res[2])
-            H7.append(P7)
-            # print(P7)
-
-        
-        vmax7 = COPz / (COPz - B)
-
-        
-        umax7 = COPz / (B - COPz)
-
-        T8 = ([1/umax7, 0, 0, 0],
-              [0, 1/vmax7, 0, 0],
-              [0, 0, 1, 0],
-              [0, 0, 0, 1])
-        
-        H8 = []
-
-        for i in range(len(H7)):
-            P = H7[i]
-            Pv = ([P[0], P[1], P[2], 1])
-            res = np.matmul(Pv, T8)
-            P8 = (res[0], res[1], res[2])
-            H8.append(P8)
-            # print(P8)
-
-        COPz8 = COPz / (COPz - B)
-        T9 = ([1, 0, 0, 0],
+        T4 = ([1, 0, 0, 0],
               [0, 1, 0, 0],
-              [0, 0, 1, -(1 / COPz8)],
+              [0, 0, 1, 0],
+              [-(umin+umax)/2, -(vmin+vmax)/2, -F, 1])
+
+
+        T5 = ([2/(umax-umin), 0, 0, 0],
+              [0, -2/(vmax-vmin), 0, 0],
+              [0, 0, 1/(F-B), 0],
               [0, 0, 0, 1])
-        
-        H9 = []
 
-        for i in range(len(H8)):
-            P = H8[i]
-            Pv = ([P[0], P[1], P[2], 1])
-            res = np.matmul(Pv, T9)
-            P9 = (res[0], res[1], res[2])
-            H9.append(P9)
-            # print(P9)
-        
-        
-        H10 = []
-        for i in range(len(H9)):
-            P = H9[i]
-            Pv = ([P[0], P[1], P[2], 1])
-            res = np.matmul(Pv, cs.pr2mat)
-            P10 = (res[0], res[1], res[2])
-            H10.append(P10)
-            # print(P10)
-        
-        # drawing
+        Pr1a = np.matmul(np.matmul(np.matmul(A, T3), T4), T5)
+        Hedges1 = []
+        for e in Hedges:
+            tmpe = []
+            for p in e:
+                p = list(p)
+                pv = ([p[0], p[1], p[2], 1])
+                res = np.matmul(pv, Pr1a)
+                tmpe.append(res)
+            Hedges1.append(tmpe)
 
-        H10b = []
-        minusY = ([1, -1, 1])
-        for i in range(len(H9)):
-            P = H10[i]
-            res = cs.Scale(P, minusY)
-            P10b = (res[0], res[1], res[2])
-            H10b.append(P10b)
-        
         cwidth = self.canvas.winfo_width()
         cheight = self.canvas.winfo_height()
         coc = (cwidth / 2, cheight / 2)
@@ -882,52 +555,28 @@ class Application(tk.Frame):
         self.canvas2.create_line(w3[0], w3[1], w4[0], w4[1])
         self.canvas2.create_line(w4[0], w4[1], w1[0], w1[1])
 
-        H11 = []
-        for p in H10b:
-            P = list(p)
-            P[0] *= coc[0] - 100
-            P[1] *= coc[1] - 100
-            P[0] += coc[0]
-            P[1] += coc[1]
-            H11.append(P)
-            # print(P)
+        Hedges2 = []
+        for e in Hedges1:
+            tmpe = []
+            for p in e:
+                p = list(p)
+                p[0] *= (wwidth / 2)
+                p[1] *= (wheight / 2) 
+                p[0] += coc[0]
+                p[1] += coc[1]
+                tmpe.append(p)
+            Hedges2.append(tmpe)
         
-        Hedges11 = []
-        Hedges11.append((H11[0], H11[1]))
-        Hedges11.append((H11[1], H11[2]))
-        Hedges11.append((H11[2], H11[3]))
-        Hedges11.append((H11[3], H11[4]))
-        Hedges11.append((H11[4], H11[0]))
-        
-        Hedges11.append((H11[5], H11[6]))
-        Hedges11.append((H11[6], H11[7]))
-        Hedges11.append((H11[7], H11[8]))
-        Hedges11.append((H11[8], H11[9]))
-        Hedges11.append((H11[9], H11[5]))
-
-        Hedges11.append((H11[0], H11[5]))
-        Hedges11.append((H11[1], H11[6]))
-        Hedges11.append((H11[2], H11[7]))
-        Hedges11.append((H11[3], H11[8]))
-        Hedges11.append((H11[4], H11[9]))
-        
-        for i, e in enumerate(Hedges11):
+        for i, e in enumerate(reversed(Hedges2)):
             p1 = e[0]
             p2 = e[1]
             # clip outside window
             newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, 'front', debug=False)
-            # print(newP1P2[0], newP1P2[1])
-            p1, p2 = newP1P2           
-            # until here
-            # print(p1, p2)
-            if(i < 5):
-                self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=5) # ganti ini jadi kanvas kedua
+            p1, p2 = newP1P2   
+            if(i > 9):
+                self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=5)
             else:
-                self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1]) # ganti ini jadi canvas kedua
-
-
-
-
+                self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1])
 
     def refreshView(self):
 
