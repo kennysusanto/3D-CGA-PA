@@ -1,93 +1,73 @@
-import math
 import numpy as np
 
-class TPoint():
-    def __init__(x, y, z):
+class TVertex():
+    def __init__(self, x: int, y: int, z: int):
+        self.x = x
+        self.y = y
+        self.z = z
+    
+    def getPoints(self):
+        return [self.x, self.y, self.z]
+
+    def updateVertex(self, x: int, y: int, z:int):
         self.x = x
         self.y = y
         self.z = z
 
 
-class TLine():
-    def __init__(x1, y1, x2, y2):
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
-
-# Orthographic Vt
-# Pr1 (Projection 1)
-fmat = ([1, 0, 0, 0],
-	   [0, 1, 0, 0], 
-	   [0, 0, 1, 0],
-	   [0, 0, 0, 1]) # Front x'=x, y'=y, z'=z
-
-rrmat = ([-1, 0, 0, 0],
-		 [0, 1, 0, 0],
-		 [0, 0, -1, 0],
-		 [0, 0, 0, 1]) # Rear x'=-x, y'=y, z'=-z
-
-lmat = ([0, 0, -1, 0],
-	    [0, 1, 0, 0], 
-	    [1, 0, 0, 0],
-	    [0, 0, 0, 1]) # Left x'=z, y'=y, z'=-x
-
-rmat = ([0, 0, 1, 0],
-	    [0, 1, 0, 0], 
-	    [-1, 0, 0, 0],
-	    [0, 0, 0, 1]) # Right x'=-z, y'=y, z'=x
-
-tmat = ([1, 0, 0, 0],
-	    [0, 0, 1, 0], 
-	    [0, -1, 0, 0],
-	    [0, 0, 0, 1]) # Top x'=x, y'=-z, z'=y
-
-bmat = ([1, 0, 0, 0],
-	    [0, 0, -1, 0], 
-	    [0, 1, 0, 0],
-	    [0, 0, 0, 1]) # Bottom x'=x, y'=z, z'=-y
-
-# Pr2 (Projection 2)
-pr2mat = ([1, 0, 0, 0], 
-		  [0, 1, 0, 0], 
-		  [0, 0, 0, 0], 
-		  [0, 0, 0, 1])
-
-def pr1pr2(objmat, pr1):
-    res = np.matmul(pr1, pr2mat)
-    res = np.matmul(objmat, res)
-    return res
-
-def getVtort(objmat, side):
-    res = []
-    sides = ['front', 'rear', 'left', 'right', 'top', 'bottom']
-    res[0] = pr1pr2(objmat, fmat)
-    res[1] = pr1pr2(objmat, rrmat)
-    res[2] = pr1pr2(objmat, lmat)
-    res[3] = pr1pr2(objmat, rmat)
-    res[4] = pr1pr2(objmat, tmat)
-    res[5] = pr1pr2(objmat, bmat)
+class TEdge():
+    def __init__(self, v1: TVertex, v2: TVertex):
+        self.v1 = v1
+        self.v2 = v2
     
-    idx = sides.index(side)
-    return res[idx]
+    def getVertices(self):
+        return [self.v1, self.v2]
 
-# Axonometric Vt
-def getVtaxo(objmat, vi, teta):
-    vt = ([math.cos(math.radians(vi)), math.sin(math.radians(alfa))*math.sin(math.radians(teta)), 0, 0],
-          [0, math.cos(math.radians(teta)), 0, 0],
-          [math.cos(math.radians(vi)), -(math.cos(math.radians(alfa))*math.sin(math.radians(teta))), 0, 0],
-          [0, 0, 0, 1])
-    res = np.matmul(objmat, pr2)
-    return res
+    def updateEdge(self, v1: TVertex, v2: TVertex):
+        self.v1 = v1
+        self.v2 = v2
 
-# Oblique Vt
-def getVtobl(objmat, vi, alfa):
-    vt = ([1, 0, 0, 0],
-          [0, 1, 0, 0],
-          [math.cot(math.radians(vi))*math.cos(math.radians(alfa)), math.cot(math.radians(vi))*math.sin(math.radians(alfa)), 0, 0],
-          [0, 0, 0, 1])
-    res = np.matmul(objmat, vt)
-    return res
+
+class TSurface():
+    def __init__(self, e1: TEdge, e2: TEdge, e3: TEdge, e4: TEdge):
+        self.e1 = e1
+        self.e2 = e2
+        self.e3 = e3
+        self.e4 = e4
+    
+    def getSurface(self):
+        return [self.e1, self.e2, self.e3, self.e4]
+
+class TVertexList():
+    def __init__(self):
+        self.vertices = []
+    
+    def addVertex(self, v: TVertex):
+        self.vertices.append(v)
+
+    def getVList(self):
+        return self.vertices
+    
+
+class TEdgeList():
+    def __init__(self):
+        self.edges = []
+    
+    def addEdge(self, e: TEdge):
+        self.edges.append(e)
+
+    def getEList(self):
+        return self.edges
+
+class TSurfaceList():
+    def __init__(self):
+        self.surfaces = []
+    
+    def addEdge(self, s: TSurface):
+        self.surfaces.append(s)
+
+    def getSList(self):
+        return self.surfaces
 
 # Scaling Transformation
 def Scale(P, V):

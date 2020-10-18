@@ -143,27 +143,21 @@ class Application(tk.Frame):
 
 
     def slidex(self, rval):
-        # rval = self.sliderx.get()
         self.vpnx.delete(0, tk.END)
         rval = float(rval)
         if(rval.is_integer()):
             rval = int(rval)
-            # print(rval)
         else:
-            # print(rval)
             pass
         self.vpnx.insert(0, str(rval))
         self.perspectiveProj()
         self.parallelProj()
 
     def slidey(self, rval):
-        # rval = self.sliderx.get()
         rval = float(rval)
         if(rval.is_integer()):
             rval = int(rval)
-            # print(rval)
         else:
-            # print(rval)
             pass
         self.vpny.delete(0, tk.END)
         self.vpny.insert(0, str(rval))
@@ -171,13 +165,10 @@ class Application(tk.Frame):
         self.parallelProj()
 
     def slidez(self, rval):
-        # rval = self.sliderx.get()
         rval = float(rval)
         if(rval.is_integer()):
             rval = int(rval)
-            # print(rval)
         else:
-            # print(rval)
             pass
         self.vpnz.delete(0, tk.END)
         self.vpnz.insert(0, str(rval))
@@ -185,39 +176,67 @@ class Application(tk.Frame):
         self.parallelProj()
 
     def theboringhouse(self):
-        H = []
         val = 1
-        H.append([-val, -val, val])  # A
-        H.append([val, -val, val])   # B 
-        H.append([val, 0, val])    # C
-        H.append([0, val, val])    # D
-        H.append([-val, 0, val])   # E
-        H.append([-val, -val, -val]) # F
-        H.append([val, -val, -val])  # G
-        H.append([val, 0, -val])   # H
-        H.append([0, val, -val])   # I
-        H.append([-val, 0, -val])  # J
+        HouseV = cs.TVertexList()
+        A = cs.TVertex(-val, -val, val)
+        B = cs.TVertex(val, -val, val)
+        C = cs.TVertex(val, 0, val)
+        D = cs.TVertex(0, val, val)
+        E = cs.TVertex(-val, 0, val)
+        F = cs.TVertex(-val, -val, -val)
+        G = cs.TVertex(val, -val, -val)
+        H = cs.TVertex(val, 0, -val)
+        I = cs.TVertex(0, val, -val)
+        J = cs.TVertex(-val, 0, -val)
 
-        Hedges = [] # house / object edges
-        Hedges.append([H[0], H[1]])   # edge 0
-        Hedges.append([H[1], H[2]])   # edge 1
-        Hedges.append([H[2], H[3]])   # edge 2
-        Hedges.append([H[3], H[4]])   # edge 3
-        Hedges.append([H[4], H[0]])   # edge 4
+        HouseV.addVertex(A)
+        HouseV.addVertex(B)
+        HouseV.addVertex(C)
+        HouseV.addVertex(D)
+        HouseV.addVertex(E)
+        HouseV.addVertex(F)
+        HouseV.addVertex(G)
+        HouseV.addVertex(H)
+        HouseV.addVertex(I)
+        HouseV.addVertex(J)
+
+        HouseVList = HouseV.getVList()
+        HouseE = cs.TEdgeList()
+        E0 = cs.TEdge(HouseVList[0], HouseVList[1])   # edge 0
+        E1 = cs.TEdge(HouseVList[1], HouseVList[2])   # edge 1
+        E2 = cs.TEdge(HouseVList[2], HouseVList[3])   # edge 2
+        E3 = cs.TEdge(HouseVList[3], HouseVList[4])   # edge 3
+        E4 = cs.TEdge(HouseVList[4], HouseVList[0])   # edge 4
         
-        Hedges.append([H[5], H[6]])   # edge 5
-        Hedges.append([H[6], H[7]])   # edge 6
-        Hedges.append([H[7], H[8]])   # edge 7
-        Hedges.append([H[8], H[9]])   # edge 8
-        Hedges.append([H[9], H[5]])   # edge 9
+        E5 = cs.TEdge(HouseVList[5], HouseVList[6])   # edge 5
+        E6 = cs.TEdge(HouseVList[6], HouseVList[7])   # edge 6
+        E7 = cs.TEdge(HouseVList[7], HouseVList[8])   # edge 7
+        E8 = cs.TEdge(HouseVList[8], HouseVList[9])   # edge 8
+        E9 = cs.TEdge(HouseVList[9], HouseVList[5])   # edge 9
 
-        Hedges.append([H[0], H[5]])   # edge 10
-        Hedges.append([H[1], H[6]])   # edge 11
-        Hedges.append([H[2], H[7]])   # edge 12
-        Hedges.append([H[3], H[8]])   # edge 13
-        Hedges.append([H[4], H[9]])   # edge 14
+        E10 = cs.TEdge(HouseVList[0], HouseVList[5])   # edge 10
+        E11 = cs.TEdge(HouseVList[1], HouseVList[6])   # edge 11
+        E12 = cs.TEdge(HouseVList[2], HouseVList[7])   # edge 12
+        E13 = cs.TEdge(HouseVList[3], HouseVList[8])   # edge 13
+        E14 = cs.TEdge(HouseVList[4], HouseVList[9])   # edge 14
 
-        return Hedges
+        HouseE.addEdge(E0)
+        HouseE.addEdge(E1)
+        HouseE.addEdge(E2)
+        HouseE.addEdge(E3)
+        HouseE.addEdge(E4)
+        HouseE.addEdge(E5)
+        HouseE.addEdge(E6)
+        HouseE.addEdge(E7)
+        HouseE.addEdge(E8)
+        HouseE.addEdge(E9)
+        HouseE.addEdge(E10)
+        HouseE.addEdge(E11)
+        HouseE.addEdge(E12)
+        HouseE.addEdge(E13)
+        HouseE.addEdge(E14)
+
+        return HouseE.getEList()
 
     def perspectiveProj(self):
         self.canvas.delete('all')
@@ -298,8 +317,9 @@ class Application(tk.Frame):
         Hedges1 = []
         for e in Hedges:
             tmpe = []
+            e = e.getVertices()
             for p in e:
-                p = list(p)
+                p = p.getPoints()
                 pv = ([p[0], p[1], p[2], 1])
                 res = np.matmul(pv, Pr1a)
                 tmpe.append(res)
@@ -307,43 +327,91 @@ class Application(tk.Frame):
         
         # T6 clipping
 
-        V = [] # view volume vertices
+        ViewVolumeV = cs.TVertexList() # view volume vertices
         F5 = (F - COPz) / (COPz - B)
         # print('F5:', F5)
-        V.append((0, 0, F5))         # vertex 0
-        V.append((0, 0, F5))         # vertex 1
-        V.append((0, 0, F5))         # vertex 2
-        V.append((0, 0, F5))         # vertex 3
-        V.append((-1, 1, -1))       # vertex 4
-        V.append((1, 1, -1))        # vertex 5
-        V.append((1, -1, -1))       # vertex 6
-        V.append((-1, -1, -1))      # vertex 7
+        v0 = cs.TVertex(0, 0, F5)         # vertex 0
+        v1 = cs.TVertex(0, 0, F5)         # vertex 1
+        v2 = cs.TVertex(0, 0, F5)         # vertex 2
+        v3 = cs.TVertex(0, 0, F5)         # vertex 3
+        v4 = cs.TVertex(-1, 1, -1)       # vertex 4
+        v5 = cs.TVertex(1, 1, -1)        # vertex 5
+        v6 = cs.TVertex(1, -1, -1)       # vertex 6
+        v7 = cs.TVertex(-1, -1, -1)      # vertex 7
 
-        edges = [] # view volume edges (counter-clockwise based on the axis of the surface)
-        edges.append((V[3], V[2]))  # edge 0
-        edges.append((V[2], V[1]))  # edge 1
-        edges.append((V[1], V[0]))  # edge 2
-        edges.append((V[0], V[3]))  # edge 3
+        ViewVolumeV.addVertex(v0)
+        ViewVolumeV.addVertex(v1)
+        ViewVolumeV.addVertex(v2)
+        ViewVolumeV.addVertex(v3)
+        ViewVolumeV.addVertex(v4)
+        ViewVolumeV.addVertex(v5)
+        ViewVolumeV.addVertex(v6)
+        ViewVolumeV.addVertex(v7)
 
-        edges.append((V[6], V[7]))  # edge 4
-        edges.append((V[7], V[4]))  # edge 5
-        edges.append((V[4], V[5]))  # edge 6
-        edges.append((V[5], V[6]))  # edge 7
+        ViewVolumeVList = ViewVolumeV.getVList()
+        ViewVolumeE = cs.TEdgeList() # view volume edges (counter-clockwise based on the axis of the surface)
+        E0 = cs.TEdge(ViewVolumeVList[3], ViewVolumeVList[2])  # edge 0
+        E1 = cs.TEdge(ViewVolumeVList[2], ViewVolumeVList[1])  # edge 1
+        E2 = cs.TEdge(ViewVolumeVList[1], ViewVolumeVList[0])  # edge 2
+        E3 = cs.TEdge(ViewVolumeVList[0], ViewVolumeVList[3])  # edge 3
 
-        edges.append((V[0], V[4]))  # edge 8
-        edges.append((V[1], V[5]))  # edge 9
-        edges.append((V[2], V[6]))  # edge 10
-        edges.append((V[3], V[7]))  # edge 11
+        E4 = cs.TEdge(ViewVolumeVList[6], ViewVolumeVList[7])  # edge 4
+        E5 = cs.TEdge(ViewVolumeVList[7], ViewVolumeVList[4])  # edge 5
+        E6 = cs.TEdge(ViewVolumeVList[4], ViewVolumeVList[5])  # edge 6
+        E7 = cs.TEdge(ViewVolumeVList[5], ViewVolumeVList[6])  # edge 7
 
-        surfaces = [] # view volume surfaces (counter-clockwise based on the axis of the surface)
-        surfaces.append((edges[0], edges[1], edges[2], edges[3]))               # front
-        # surfaces.append(((V[0], V[1]), (V[1], V[2]), (V[2], V[3]), (V[3], V[0])))
-        surfaces.append((edges[4], edges[5], edges[6], edges[7]))               # back
-        surfaces.append(((V[7], V[3]), (V[3], V[0]), edges[8], (V[4], V[7])))   # left
-        surfaces.append((edges[10], (V[6], V[5]), (V[5], V[1]), (V[1], V[2])))  # right
-        surfaces.append(((V[0], V[1]), edges[9], (V[5], V[4]), (V[4], V[0])))   # top
-        surfaces.append(((V[7], V[6]), (V[6], V[2]), (V[2], V[3]), edges[11]))  # bottom
+        E8 = cs.TEdge(ViewVolumeVList[0], ViewVolumeVList[4])  # edge 8
+        E9 = cs.TEdge(ViewVolumeVList[1], ViewVolumeVList[5])  # edge 9
+        E10 = cs.TEdge(ViewVolumeVList[2], ViewVolumeVList[6])  # edge 10
+        E11 = cs.TEdge(ViewVolumeVList[3], ViewVolumeVList[7])  # edge 11
+
+        ViewVolumeE.addEdge(E0)
+        ViewVolumeE.addEdge(E1)
+        ViewVolumeE.addEdge(E2)
+        ViewVolumeE.addEdge(E3)
+        ViewVolumeE.addEdge(E4)
+        ViewVolumeE.addEdge(E5)
+        ViewVolumeE.addEdge(E6)
+        ViewVolumeE.addEdge(E7)
+        ViewVolumeE.addEdge(E8)
+        ViewVolumeE.addEdge(E9)
+        ViewVolumeE.addEdge(E10)
+        ViewVolumeE.addEdge(E11)
+
+        ViewVolumeEList = ViewVolumeE.getEList()
+        ViewVolumeS = cs.TSurfaceList() # view volume surfaces (counter-clockwise based on the axis of the surface)
+        S0 = cs.TSurface(ViewVolumeEList[0], ViewVolumeEList[1], ViewVolumeEList[2], ViewVolumeEList[3])               # front
+        S1 = cs.TSurface(ViewVolumeEList[4], ViewVolumeEList[5], ViewVolumeEList[6], ViewVolumeEList[7])               # back
+        S2 = cs.TSurface((ViewVolumeVList[7], ViewVolumeVList[3]), (ViewVolumeVList[3], ViewVolumeVList[0]), ViewVolumeEList[8], (ViewVolumeVList[4], ViewVolumeVList[7]))   # left
+        S3 = cs.TSurface(ViewVolumeEList[10], (ViewVolumeVList[6], ViewVolumeVList[5]), (ViewVolumeVList[5], ViewVolumeVList[1]), (ViewVolumeVList[1], ViewVolumeVList[2]))  # right
+        S4 = cs.TSurface((ViewVolumeVList[0], ViewVolumeVList[1]), ViewVolumeEList[9], (ViewVolumeVList[5], ViewVolumeVList[4]), (ViewVolumeVList[4], ViewVolumeVList[0]))   # top
+        S5 = cs.TSurface((ViewVolumeVList[7], ViewVolumeVList[6]), (ViewVolumeVList[6], ViewVolumeVList[2]), (ViewVolumeVList[2], ViewVolumeVList[3]), ViewVolumeEList[11])  # bottom
         
+        ViewVolumeS.addEdge(S0)
+        ViewVolumeS.addEdge(S1)
+        ViewVolumeS.addEdge(S2)
+        ViewVolumeS.addEdge(S3)
+        ViewVolumeS.addEdge(S4)
+        ViewVolumeS.addEdge(S5)
+
+        ViewVolumeSList = ViewVolumeS.getSList()
+        surfaces = []
+
+        for s in ViewVolumeSList:
+            s = s.getSurface()
+            tmps = []
+            for e in s:
+                tmpe = []
+                if(isinstance(e, cs.TEdge)):
+                    e = e.getVertices()
+                else:
+                    pass
+                for v in e:
+                    v = v.getPoints()
+                    tmpe.append(v)
+                tmps.append(tmpe)
+            surfaces.append(tmps)
+
         Hedges2 = []
         for i, edge in enumerate(Hedges1):
             # print(f'\nedge: {i}')
@@ -520,8 +588,9 @@ class Application(tk.Frame):
         Hedges1 = []
         for e in Hedges:
             tmpe = []
+            e = e.getVertices()
             for p in e:
-                p = list(p)
+                p = p.getPoints()
                 pv = ([p[0], p[1], p[2], 1])
                 res = np.matmul(pv, Pr1a)
                 tmpe.append(res)
@@ -574,7 +643,7 @@ class Application(tk.Frame):
             newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, 'front', debug=False)
             p1, p2 = newP1P2   
             if(i > 9):
-                self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=5)
+                self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
             else:
                 self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1])
 

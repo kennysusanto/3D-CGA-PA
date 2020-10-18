@@ -1,47 +1,6 @@
 import math
 import numpy as np
 
-V = []
-absval = 2
-# ikuti urutan vertex ini (kiri atas depan startnya, counter-clockwise)
-V.append((-absval, absval, absval))
-V.append((absval, absval, absval))
-V.append((absval, -absval, absval))
-V.append((-absval, -absval, absval))
-V.append((-absval, absval, -absval))
-V.append((absval, absval, -absval))
-V.append((absval, -absval, -absval))
-V.append((-absval, -absval, -absval))
-
-edges = []
-edges.append((V[0], V[1])) # edge 0
-edges.append((V[1], V[2])) # edge 1
-edges.append((V[2], V[3])) # edge 2
-edges.append((V[3], V[0])) # edge 3
-
-edges.append((V[4], V[5])) # edge 4
-edges.append((V[5], V[6])) # edge 5
-edges.append((V[6], V[7])) # edge 6
-edges.append((V[7], V[4])) # edge 7
-
-edges.append((V[0], V[4])) # edge 8
-edges.append((V[1], V[5])) # edge 9
-edges.append((V[2], V[6])) # edge 10
-edges.append((V[3], V[7])) # edge 11
-
-surfaces = []
-# ikutin urutan edges ini
-surfaces.append((edges[0], edges[1], edges[2], edges[3])) # front
-surfaces.append((edges[4], edges[5], edges[6], edges[7])) # back
-surfaces.append((edges[4], (V[5], V[1]), (V[1], V[0]), edges[8])) # top
-surfaces.append(((V[7], V[6]), (V[6], V[2]), edges[2], edges[11])) # bottom
-surfaces.append(((V[4], V[0]), (V[0], V[3]), edges[11], edges[7])) # left
-surfaces.append(((V[5], V[1]), edges[1], edges[10], (V[6], V[5]))) # right
-
-# Line yg mau di clip
-P1 = (-3, -3, 3)
-P2 = (3, 1, 1)
-
 # N vector is (-dy, dx) for left and (dy, -dx) for right
 
 # parametric line equation C = A + t * (B - A)
