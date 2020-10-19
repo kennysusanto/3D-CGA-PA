@@ -308,9 +308,9 @@ class Application(tk.Frame):
         h = ((COPz - B) * (vmax - vmin)) / (2 * COPz)
         w = ((COPz - B) * (umax - umin)) / (2 * COPz)
 
-        T5 = ([-1/w, 0, 0, 0],      # beda
-              [0, 1/h, 0, 0],
-              [0, 0, -(1/BP4), 0],
+        T5 = ([1/w, 0, 0, 0],       #       1/w
+              [0, -1/h, 0, 0],      # beda  1/h
+              [0, 0, (1/BP4), 0],   # beda  -(1/BP4)
               [0, 0, 0, 1])
 
         Pr1a = np.matmul(np.matmul(np.matmul(A, T3), T4), T5)
@@ -414,8 +414,9 @@ class Application(tk.Frame):
 
         Hedges2 = []
         for i, edge in enumerate(Hedges1):
-            # print(f'\nedge: {i}')
-            res = cb.cyrusbeck3d(edge[0], edge[1], surfaces, debug=False)
+            print(f'\nedge: {i}')
+            # print(edge[0])
+            res = cb.cyrusbeck3d(edge[0], edge[1], surfaces, debug=True)
             if(res is not None):
                 Hedges2.append(res)
             else:
@@ -506,11 +507,11 @@ class Application(tk.Frame):
             Hedges4.append(tmpe)
         
         for i, e in enumerate(reversed(Hedges4)):
-            
             p1 = e[0]
             p2 = e[1]
+            
             # clip outside window
-            newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, 'front', debug=False)
+            newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, debug=False)
             p1, p2 = newP1P2        
             if(i > 9):
                 self.canvas.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
@@ -640,7 +641,7 @@ class Application(tk.Frame):
             p1 = e[0]
             p2 = e[1]
             # clip outside window
-            newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, 'front', debug=False)
+            newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, debug=False)
             p1, p2 = newP1P2   
             if(i > 9):
                 self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)

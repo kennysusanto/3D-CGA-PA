@@ -61,10 +61,14 @@ def cyrusbeck3d(P1, P2, S, debug=True):
         entering = []
         leaving = []
         
-        
-        
+        tmpe1 = np.subtract(edges[0][1], edges[0][0])
+        tmpe2 = np.subtract(edges[1][1], edges[1][0])
+
+        Ntmp = np.cross(tmpe1, tmpe2)
         N = planeNormals[idx]
-        # print('N: ' + str(N))
+        if(debug): 
+            print('N: ' + str(N))
+            print('Ntmp:', Ntmp[0], Ntmp[1], Ntmp[2])
 
         P = edges[0][1] # second vertex in first edge
         P = ([P[0], P[1], P[2]])
@@ -78,6 +82,8 @@ def cyrusbeck3d(P1, P2, S, debug=True):
         # if(f2 > 0): print('B is inside edge ' + str(i + 1))
         # elif(f2 < 0): print('B is outside edge ' + str(i + 1))
         # else: print('B is on edge ' + str(i + 1))
+
+        if(debug): print(A, B, P)
     
         if(f > 0 and f2 > 0):
             # print('trivially accepted' + ' f: ' + str(f) + ' f2: ' + str(f2))
@@ -87,11 +93,12 @@ def cyrusbeck3d(P1, P2, S, debug=True):
         elif(f < 0 and f2 < 0):
             # print('trivially rejected' + ' f: ' + str(f) + ' f2: ' + str(f2))
             if(debug): print('trivially rejected', f, f2)
-            P1res = np.multiply(P1, 100)
-            P2res = np.multiply(P2, 100)
+            P1res = P1
+            P2res = P2
             # P1res = P1
             # P2res = P2
-            return P1res, P2res
+            # return P1res, P2res
+            return None
             # print(ep1, ep2)
         else:
             # print('perform clipping' + ' f: ' + str(f) + ' f2: ' + str(f2))
@@ -217,7 +224,7 @@ def cyrusbeck3d(P1, P2, S, debug=True):
 
     
 
-def cyrusbeckv2(P1, P2, V, E, dir='right', debug=True):
+def cyrusbeckv2(P1, P2, V, E, debug=True):
     # P1 & P2 are the points of the line we'd like to clip
     # V is the vertices of the object
     # E is the edges of the object
@@ -228,12 +235,8 @@ def cyrusbeckv2(P1, P2, V, E, dir='right', debug=True):
     a = 0
     r = 0
 
-    if(dir == 'right'):
-        A = ([P1[2], P1[1]])
-        B = ([P2[2], P2[1]])    
-    elif(dir == 'front'):
-        A = ([P1[0], P1[1]])
-        B = ([P2[0], P2[1]])    
+    A = ([P1[0], P1[1]])
+    B = ([P2[0], P2[1]])    
 
     for e in E:
 
@@ -247,12 +250,7 @@ def cyrusbeckv2(P1, P2, V, E, dir='right', debug=True):
         dx = ep2[0] - ep1[0]
 
         
-        if(dir == 'right'):
-            N = ([dy, -dx])
-        elif(dir == 'front'):
-            N = ([-dy, dx])
-        
-
+        N = ([-dy, dx])
         
         # print('N: ' + str(N))
 
@@ -365,12 +363,8 @@ def cyrusbeckv2(P1, P2, V, E, dir='right', debug=True):
             # print('B = ' + str(P2))
             # print('A prime = ' + str(A))
             # print('B prime = ' + str(B))
-            if(dir == 'right'):
-                P1res = (P1[0], A[1], A[0])
-                P2res = (P2[0], B[1], B[0])
-            elif(dir == 'front'):
-                P1res = (A[0], A[1], P1[2])
-                P2res = (B[0], B[1], P2[2])
+            P1res = (A[0], A[1], P1[2])
+            P2res = (B[0], B[1], P2[2])
 
             
         elif(te > tl):
@@ -390,17 +384,3 @@ def cyrusbeckv2(P1, P2, V, E, dir='right', debug=True):
     if(debug): print(P1res, P2res)
     
     return P1res, P2res
-
-# P3 = (0, 0, -math.sqrt(2))
-# P4 = (0, 0, ((9 * math.sqrt(2))/5))
-# V2 = []
-# V2.append((0, 2))
-# V2.append((5, 2))
-# V2.append((5, -2))
-# V2.append((0, -2))
-# E2 = []
-# E2.append((V2[0], V2[1]))
-# E2.append((V2[1], V2[2]))
-# E2.append((V2[2], V2[3]))
-# E2.append((V2[3], V2[0]))
-# print(cyrusbeckv2(P3, P4, V2, E2))
