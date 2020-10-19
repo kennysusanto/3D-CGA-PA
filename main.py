@@ -4,6 +4,7 @@ import numpy as np
 import math
 from PIL import Image, ImageTk
 import cyrusbecklineclipping as cb
+import ast
 
 class Application(tk.Frame):
     def __init__(self, master=None):
@@ -141,6 +142,12 @@ class Application(tk.Frame):
         self.sVPNz.set(1)
         self.sVPNz.grid(row=12, column=1, columnspan=3, sticky='nesw')
 
+        self.resetbtn = tk.Button(self.frame3, text='The Boring House',fg="#108c80", command=self.switchH)
+        self.resetbtn.grid(row=13, column=0, sticky='nesw', columnspan=2)
+
+        self.quit = tk.Button(self.frame3, text="Boring Cube", fg="Blue", command=self.switchC)
+        self.quit.grid(row=13, column=2, sticky='nesw', columnspan=2)
+
 
     def slidex(self, rval):
         self.vpnx.delete(0, tk.END)
@@ -238,9 +245,91 @@ class Application(tk.Frame):
 
         return HouseE.getEList()
 
+    def boringCube(self):
+
+        cubeV = cs.TVertexList()
+
+        Cedgess = []
+        with open('boringCube.txt', 'r') as f:
+            testing = list([line.strip() for line in f])
+
+            for i in testing:
+                res = ast.literal_eval(i)
+                Cedgess.append(res)
+            A = cs.TVertex(Cedgess[0], Cedgess[1], Cedgess[2])
+            B = cs.TVertex(Cedgess[3], Cedgess[4], Cedgess[5])
+            C = cs.TVertex(Cedgess[6], Cedgess[7], Cedgess[8])
+            D = cs.TVertex(Cedgess[9], Cedgess[10], Cedgess[11])
+            E = cs.TVertex(Cedgess[12], Cedgess[13], Cedgess[14])
+            F = cs.TVertex(Cedgess[15], Cedgess[16], Cedgess[17])
+            G = cs.TVertex(Cedgess[18], Cedgess[19], Cedgess[20])
+            H = cs.TVertex(Cedgess[21], Cedgess[22], Cedgess[23])
+
+            # SAMPE H
+        cubeV.addVertex(A)
+        cubeV.addVertex(B)
+        cubeV.addVertex(C)
+        cubeV.addVertex(D)
+        cubeV.addVertex(E)
+        cubeV.addVertex(F)
+        cubeV.addVertex(G)
+        cubeV.addVertex(H)
+
+        HouseV2List = cubeV.getVList()
+        cubeE = cs.TEdgeList()
+
+        Cedges2 = []
+        with open('boringCubeEdges.txt', 'r') as f:
+            testing = list([line.strip() for line in f])
+            for i in testing:
+                res = ast.literal_eval(i)
+                Cedges2.append(res)
+            E0 = cs.TEdge(Cedges2[0],Cedges2[1])
+            E1 = cs.TEdge(Cedges2[2], Cedges2[3])
+            E2 = cs.TEdge(Cedges2[4], Cedges2[5])
+            E3 = cs.TEdge(Cedges2[6], Cedges2[7])
+            E4 = cs.TEdge(Cedges2[8], Cedges2[9])
+            E5 = cs.TEdge(Cedges2[10], Cedges2[11])
+            E6 = cs.TEdge(Cedges2[12], Cedges2[13])
+            E7 = cs.TEdge(Cedges2[14], Cedges2[15])
+            E8 = cs.TEdge(Cedges2[16], Cedges2[17])
+            E9 = cs.TEdge(Cedges2[18], Cedges2[19])
+            E10 = cs.TEdge(Cedges2[20], Cedges2[21])
+            E11 = cs.TEdge(Cedges2[22], Cedges2[23])
+
+
+
+        cubeE.addEdge(E0)
+        cubeE.addEdge(E1)
+        cubeE.addEdge(E2)
+        cubeE.addEdge(E3)
+        cubeE.addEdge(E4)
+        cubeE.addEdge(E5)
+        cubeE.addEdge(E6)
+        cubeE.addEdge(E7)
+        cubeE.addEdge(E8)
+        cubeE.addEdge(E9)
+        cubeE.addEdge(E10)
+        cubeE.addEdge(E11)
+
+
+
+        return cubeE.getEList()
+
+
+
+    def switchH(self):
+        self.Hedges = self.theboringhouse()
+        self.draw = 9
+        self.refreshView()
+
+    def switchC(self):
+        self.Hedges = self.boringCube()
+        self.draw = 7
+        self.refreshView()
     def perspectiveProj(self):
         self.canvas.delete('all')
-        Hedges = self.theboringhouse()
+
 
         VRP = ([float(self.vrpx.get()), float(self.vrpy.get()), float(self.vrpz.get())])
         VPN = ([float(self.vpnx.get()), float(self.vpny.get()), float(self.vpnz.get())])
@@ -315,11 +404,16 @@ class Application(tk.Frame):
 
         Pr1a = np.matmul(np.matmul(np.matmul(A, T3), T4), T5)
         Hedges1 = []
-        for e in Hedges:
+
+        for e in self.Hedges:
+
             tmpe = []
             e = e.getVertices()
             for p in e:
-                p = p.getPoints()
+                if (isinstance(p, cs.TVertex)):
+                    p = p.getPoints()
+                else:
+                    pass
                 pv = ([p[0], p[1], p[2], 1])
                 res = np.matmul(pv, Pr1a)
                 tmpe.append(res)
@@ -513,14 +607,14 @@ class Application(tk.Frame):
             # clip outside window
             newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, debug=False)
             p1, p2 = newP1P2        
-            if(i > 9):
+            if(i > self.draw):
                 self.canvas.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
             else:
                 self.canvas.create_line(p1[0], p1[1], p2[0], p2[1],fill="black",width=2.5)
     
     def parallelProj(self):
         self.canvas2.delete('all')
-        Hedges = self.theboringhouse()
+
 
         VRP = ([float(self.vrpx.get()), float(self.vrpy.get()), float(self.vrpz.get())])
         VPN = ([float(self.vpnx.get()), float(self.vpny.get()), float(self.vpnz.get())])
@@ -587,11 +681,15 @@ class Application(tk.Frame):
 
         Pr1a = np.matmul(np.matmul(np.matmul(A, T3), T4), T5)
         Hedges1 = []
-        for e in Hedges:
+        for e in self.Hedges:
             tmpe = []
             e = e.getVertices()
             for p in e:
-                p = p.getPoints()
+                if(isinstance(p, cs.TVertex)):
+                    p = p.getPoints()
+                else:
+                    pass
+
                 pv = ([p[0], p[1], p[2], 1])
                 res = np.matmul(pv, Pr1a)
                 tmpe.append(res)
@@ -643,7 +741,7 @@ class Application(tk.Frame):
             # clip outside window
             newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, debug=False)
             p1, p2 = newP1P2   
-            if(i > 9):
+            if(i > self.draw):
                 self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
             else:
                 self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1])
