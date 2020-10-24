@@ -13,6 +13,7 @@ class Application(tk.Frame):
         self.master.title('Perspective Viewing 2020')
         self.pack(fill='both', expand=True)
         self.create_widgets()
+        self.switchH()
 
     def create_widgets(self):
         self.frame1 = tk.Frame(self, bg='gray', padx=8, pady=6)
@@ -112,13 +113,13 @@ class Application(tk.Frame):
         self.bp.grid(row=7, column=1, padx=pad10, pady=pad5)
         self.bp.insert(0, '-10')
 
-        self.refreshbtn = tk.Button(self.frame3, text='Refresh', command=self.refreshView)
+        self.refreshbtn = tk.Button(self.frame3, text='Refresh', command=self.refreshView, padx=pad10, pady=pad10)
         self.refreshbtn.grid(row=8, column=0, sticky='nesw', columnspan=4)
 
-        self.resetbtn = tk.Button(self.frame3, text='Reset', command=self.resetView)
+        self.resetbtn = tk.Button(self.frame3, text='Reset', command=self.resetView, padx=pad10, pady=pad5)
         self.resetbtn.grid(row=9, column=0, sticky='nesw', columnspan=2)
 
-        self.quit = tk.Button(self.frame3, text="QUIT", fg="red", command=self.master.destroy)
+        self.quit = tk.Button(self.frame3, text="QUIT", fg="red", command=self.master.destroy, padx=pad10, pady=pad5)
         self.quit.grid(row=9, column=2, sticky='nesw', columnspan=2)
 
         self.sVPNxlbl = tk.Label(self.frame3, text='VPNx slider:')
@@ -142,11 +143,11 @@ class Application(tk.Frame):
         self.sVPNz.set(1)
         self.sVPNz.grid(row=12, column=1, columnspan=3, sticky='nesw')
 
-        self.resetbtn = tk.Button(self.frame3, text='The Boring House',fg="#108c80", command=self.switchH)
-        self.resetbtn.grid(row=13, column=0, sticky='nesw', columnspan=2)
+        self.housebtn = tk.Button(self.frame3, text='The Boring House',fg="#108c80", command=self.switchH, padx=pad10, pady=pad5)
+        self.housebtn.grid(row=13, column=0, sticky='nesw', columnspan=2)
 
-        self.quit = tk.Button(self.frame3, text="Boring Cube", fg="Blue", command=self.switchC)
-        self.quit.grid(row=13, column=2, sticky='nesw', columnspan=2)
+        self.cubebtn = tk.Button(self.frame3, text="Boring Cube", fg="Blue", command=self.switchC, padx=pad10, pady=pad5)
+        self.cubebtn.grid(row=13, column=2, sticky='nesw', columnspan=2)
 
 
     def slidex(self, rval):
@@ -157,8 +158,7 @@ class Application(tk.Frame):
         else:
             pass
         self.vpnx.insert(0, str(rval))
-        self.perspectiveProj()
-        self.parallelProj()
+        self.refreshView()
 
     def slidey(self, rval):
         rval = float(rval)
@@ -168,8 +168,7 @@ class Application(tk.Frame):
             pass
         self.vpny.delete(0, tk.END)
         self.vpny.insert(0, str(rval))
-        self.perspectiveProj()
-        self.parallelProj()
+        self.refreshView()
 
     def slidez(self, rval):
         rval = float(rval)
@@ -179,8 +178,7 @@ class Application(tk.Frame):
             pass
         self.vpnz.delete(0, tk.END)
         self.vpnz.insert(0, str(rval))
-        self.perspectiveProj()
-        self.parallelProj()
+        self.refreshView()
 
     def theboringhouse(self):
         val = 1
@@ -265,7 +263,7 @@ class Application(tk.Frame):
             G = cs.TVertex(Cedgess[18], Cedgess[19], Cedgess[20])
             H = cs.TVertex(Cedgess[21], Cedgess[22], Cedgess[23])
 
-            # SAMPE H
+    
         cubeV.addVertex(A)
         cubeV.addVertex(B)
         cubeV.addVertex(C)
@@ -316,8 +314,6 @@ class Application(tk.Frame):
 
         return cubeE.getEList()
 
-
-
     def switchH(self):
         self.Hedges = self.theboringhouse()
         self.draw = 9
@@ -327,9 +323,9 @@ class Application(tk.Frame):
         self.Hedges = self.boringCube()
         self.draw = 7
         self.refreshView()
+
     def perspectiveProj(self):
         self.canvas.delete('all')
-
 
         VRP = ([float(self.vrpx.get()), float(self.vrpy.get()), float(self.vrpz.get())])
         VPN = ([float(self.vpnx.get()), float(self.vpny.get()), float(self.vpnz.get())])
@@ -367,7 +363,7 @@ class Application(tk.Frame):
 
         COPz = COP[2]
         F = fp
-        B = -bp
+        B = bp
 
         CW = ([(umax + umin)/2, (vmax + vmin)/2, 0])
         DOP = np.subtract(CW, COP)
@@ -398,8 +394,8 @@ class Application(tk.Frame):
         w = ((COPz - B) * (umax - umin)) / (2 * COPz)
 
         T5 = ([1/w, 0, 0, 0],       #       1/w
-              [0, -1/h, 0, 0],      # beda  1/h
-              [0, 0, (1/BP4), 0],   # beda  -(1/BP4)
+              [0, 1/h, 0, 0],      # beda  1/h
+              [0, 0, -(1/BP4), 0],   # beda  -(1/BP4)
               [0, 0, 0, 1])
 
         Pr1a = np.matmul(np.matmul(np.matmul(A, T3), T4), T5)
@@ -422,16 +418,26 @@ class Application(tk.Frame):
         # T6 clipping
 
         ViewVolumeV = cs.TVertexList() # view volume vertices
+        
+        
+        # F = (fp+1) * 2
+        # B = bp
+        # F5 = (F - COPz) / (COPz - B)
+        # B5 = F5 - 1
+
         F5 = (F - COPz) / (COPz - B)
+        B5 = -1
+
         # print('F5:', F5)
-        v0 = cs.TVertex(0, 0, F5)         # vertex 0
-        v1 = cs.TVertex(0, 0, F5)         # vertex 1
-        v2 = cs.TVertex(0, 0, F5)         # vertex 2
-        v3 = cs.TVertex(0, 0, F5)         # vertex 3
-        v4 = cs.TVertex(-1, 1, -1)       # vertex 4
-        v5 = cs.TVertex(1, 1, -1)        # vertex 5
-        v6 = cs.TVertex(1, -1, -1)       # vertex 6
-        v7 = cs.TVertex(-1, -1, -1)      # vertex 7
+        v0 = cs.TVertex(-1, 1, F5)         # vertex 0
+        v1 = cs.TVertex(1, 1, F5)         # vertex 1
+        v2 = cs.TVertex(1, -1, F5)         # vertex 2
+        v3 = cs.TVertex(-1, -1, F5)         # vertex 3
+        v4 = cs.TVertex(-1, 1, B5)       # vertex 4
+        # v0 sampe v4 harusnya (x, y) = (0, 0) supaya pyramid
+        v5 = cs.TVertex(1, 1, B5)        # vertex 5
+        v6 = cs.TVertex(1, -1, B5)       # vertex 6
+        v7 = cs.TVertex(-1, -1, B5)      # vertex 7
 
         ViewVolumeV.addVertex(v0)
         ViewVolumeV.addVertex(v1)
@@ -443,21 +449,21 @@ class Application(tk.Frame):
         ViewVolumeV.addVertex(v7)
 
         ViewVolumeVList = ViewVolumeV.getVList()
-        ViewVolumeE = cs.TEdgeList() # view volume edges (counter-clockwise based on the axis of the surface)
-        E0 = cs.TEdge(ViewVolumeVList[3], ViewVolumeVList[2])  # edge 0
-        E1 = cs.TEdge(ViewVolumeVList[2], ViewVolumeVList[1])  # edge 1
-        E2 = cs.TEdge(ViewVolumeVList[1], ViewVolumeVList[0])  # edge 2
-        E3 = cs.TEdge(ViewVolumeVList[0], ViewVolumeVList[3])  # edge 3
+        ViewVolumeE = cs.TEdgeList() # view volume edges (clockwise based on the axis of the surface)
+        E0 = cs.TEdge(ViewVolumeVList[0], ViewVolumeVList[1])  # edge 0
+        E1 = cs.TEdge(ViewVolumeVList[1], ViewVolumeVList[2])  # edge 1
+        E2 = cs.TEdge(ViewVolumeVList[2], ViewVolumeVList[3])  # edge 2
+        E3 = cs.TEdge(ViewVolumeVList[3], ViewVolumeVList[0])  # edge 3
 
-        E4 = cs.TEdge(ViewVolumeVList[6], ViewVolumeVList[7])  # edge 4
-        E5 = cs.TEdge(ViewVolumeVList[7], ViewVolumeVList[4])  # edge 5
-        E6 = cs.TEdge(ViewVolumeVList[4], ViewVolumeVList[5])  # edge 6
-        E7 = cs.TEdge(ViewVolumeVList[5], ViewVolumeVList[6])  # edge 7
+        E4 = cs.TEdge(ViewVolumeVList[5], ViewVolumeVList[4])  # edge 4
+        E5 = cs.TEdge(ViewVolumeVList[4], ViewVolumeVList[7])  # edge 5
+        E6 = cs.TEdge(ViewVolumeVList[7], ViewVolumeVList[6])  # edge 6
+        E7 = cs.TEdge(ViewVolumeVList[6], ViewVolumeVList[4])  # edge 7
 
         E8 = cs.TEdge(ViewVolumeVList[0], ViewVolumeVList[4])  # edge 8
-        E9 = cs.TEdge(ViewVolumeVList[1], ViewVolumeVList[5])  # edge 9
+        E9 = cs.TEdge(ViewVolumeVList[5], ViewVolumeVList[1])  # edge 9
         E10 = cs.TEdge(ViewVolumeVList[2], ViewVolumeVList[6])  # edge 10
-        E11 = cs.TEdge(ViewVolumeVList[3], ViewVolumeVList[7])  # edge 11
+        E11 = cs.TEdge(ViewVolumeVList[7], ViewVolumeVList[3])  # edge 11
 
         ViewVolumeE.addEdge(E0)
         ViewVolumeE.addEdge(E1)
@@ -473,13 +479,13 @@ class Application(tk.Frame):
         ViewVolumeE.addEdge(E11)
 
         ViewVolumeEList = ViewVolumeE.getEList()
-        ViewVolumeS = cs.TSurfaceList() # view volume surfaces (counter-clockwise based on the axis of the surface)
+        ViewVolumeS = cs.TSurfaceList() # view volume surfaces (clockwise based on the axis of the surface)
         S0 = cs.TSurface(ViewVolumeEList[0], ViewVolumeEList[1], ViewVolumeEList[2], ViewVolumeEList[3])               # front
         S1 = cs.TSurface(ViewVolumeEList[4], ViewVolumeEList[5], ViewVolumeEList[6], ViewVolumeEList[7])               # back
-        S2 = cs.TSurface((ViewVolumeVList[7], ViewVolumeVList[3]), (ViewVolumeVList[3], ViewVolumeVList[0]), ViewVolumeEList[8], (ViewVolumeVList[4], ViewVolumeVList[7]))   # left
-        S3 = cs.TSurface(ViewVolumeEList[10], (ViewVolumeVList[6], ViewVolumeVList[5]), (ViewVolumeVList[5], ViewVolumeVList[1]), (ViewVolumeVList[1], ViewVolumeVList[2]))  # right
-        S4 = cs.TSurface((ViewVolumeVList[0], ViewVolumeVList[1]), ViewVolumeEList[9], (ViewVolumeVList[5], ViewVolumeVList[4]), (ViewVolumeVList[4], ViewVolumeVList[0]))   # top
-        S5 = cs.TSurface((ViewVolumeVList[7], ViewVolumeVList[6]), (ViewVolumeVList[6], ViewVolumeVList[2]), (ViewVolumeVList[2], ViewVolumeVList[3]), ViewVolumeEList[11])  # bottom
+        S2 = cs.TSurface((ViewVolumeVList[4], ViewVolumeVList[0]), (ViewVolumeVList[0], ViewVolumeVList[3]), (ViewVolumeVList[3], ViewVolumeVList[7]), (ViewVolumeVList[7], ViewVolumeVList[4]))   # left
+        S3 = cs.TSurface((ViewVolumeVList[1], ViewVolumeVList[5]), (ViewVolumeVList[5], ViewVolumeVList[6]), (ViewVolumeVList[6], ViewVolumeVList[2]), (ViewVolumeVList[2], ViewVolumeVList[1]))  # right
+        S4 = cs.TSurface((ViewVolumeVList[4], ViewVolumeVList[5]), ViewVolumeEList[9], (ViewVolumeVList[1], ViewVolumeVList[0]), ViewVolumeEList[8])   # top
+        S5 = cs.TSurface((ViewVolumeVList[3], ViewVolumeVList[2]), ViewVolumeEList[10], (ViewVolumeVList[6], ViewVolumeVList[7]), ViewVolumeEList[11])  # bottom
         
         ViewVolumeS.addEdge(S0)
         ViewVolumeS.addEdge(S1)
@@ -506,21 +512,19 @@ class Application(tk.Frame):
                 tmps.append(tmpe)
             surfaces.append(tmps)
 
+        
         Hedges2 = []
         for i, edge in enumerate(Hedges1):
-            print(f'\nedge: {i}')
-            # print(edge[0])
-            res = cb.cyrusbeck3d(edge[0], edge[1], surfaces, debug=True)
-            if(res is not None):
-                Hedges2.append(res)
-            else:
-                pass
+            # print(f'\nedge: {i}')
+            # print(edge[0][2])
+            res = cb.cyrusbeck3d(edge[0], edge[1], surfaces, debug=False)
+            Hedges2.append(res)
             
-            # print(res)
-        
+        # print(f'total edges before clipping: {len(Hedges1)}')
+        # print(f'total edges after clipping: {len(Hedges2)}')
+        # print(Hedges2)
         
         VP5 = COPz / (B - COPz)
-        T7t = ([0, 0, VP5]) # beda
         T7 = ([1, 0, 0, 0],
               [0, 1, 0, 0],
               [0, 0, 1, 0],
@@ -530,7 +534,7 @@ class Application(tk.Frame):
 
         umax7 = COPz / (COPz - B)
 
-        T8 = ([1/vmax7, 0, 0, 0], # beda
+        T8 = ([1/umax7, 0, 0, 0], 
               [0, 1/vmax7, 0, 0],
               [0, 0, 1, 0],
               [0, 0, 0, 1])
@@ -545,18 +549,25 @@ class Application(tk.Frame):
         Pr1b = np.matmul(np.matmul(T7, T8), T9)
         for e in Hedges2:
             tmpe = []
-            for p in e:
-                p = list(p)
-                pv = ([p[0], p[1], p[2], 1])
-                res = np.matmul(pv, Pr1b)
-                p = res
-                if(p[3] == 0):
-                    pass
-                else:
-                    p[0] = p[0]/p[3]
-                    p[1] = p[1]/p[3]
-                tmpe.append(p)
+            if(e is not None):
+                for p in e:
+                    
+                    p = list(p)
+                    pv = ([p[0], p[1], p[2], 1])
+                    res = np.matmul(pv, Pr1b)
+                    p = res
+                    if(p[3] == 0):
+                        p[0] *= 100
+                        p[1] *= 100
+                        # pass
+                    else:
+                        p[0] = p[0]/p[3]
+                        p[1] = p[1]/p[3]
+                    tmpe.append(p)
+            else:
+                tmpe.append(None)    
             Hedges3.append(tmpe)
+
         
         # drawing
         
@@ -591,26 +602,36 @@ class Application(tk.Frame):
         Hedges4 = []
         for e in Hedges3:
             tmpe = []
-            for p in e:
-                p = list(p)
-                p[0] *= (wwidth / 2)
-                p[1] *= (wheight / 2) 
-                p[0] += coc[0]
-                p[1] += coc[1]
-                tmpe.append(p)
+            if(e[0] is not None):
+                for p in e:
+                    p = list(p)
+                    p[0] *= (wwidth / 2)
+                    p[1] *= (wheight / 2) 
+                    p[0] += coc[0]
+                    p[1] += coc[1]
+                    tmpe.append(p)
+            else:
+                tmpe.append(None)
             Hedges4.append(tmpe)
         
         for i, e in enumerate(reversed(Hedges4)):
-            p1 = e[0]
-            p2 = e[1]
+            if(e[0] is not None):
+                p1 = e[0]
+                p2 = e[1]
+                
+                # clip outside window
+                res = cb.cyrusbeckv2(p1, p2, wedges, debug=False)
+                if(i > self.draw):
+                    if(res is not None):
+                        p1, p2 = res    
+                        self.canvas.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
+                else:
+                    if(res is not None):
+                        p1, p2 = res    
+                        self.canvas.create_line(p1[0], p1[1], p2[0], p2[1],fill="black",width=2.5)  
+
+
             
-            # clip outside window
-            newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, debug=False)
-            p1, p2 = newP1P2        
-            if(i > self.draw):
-                self.canvas.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
-            else:
-                self.canvas.create_line(p1[0], p1[1], p2[0], p2[1],fill="black",width=2.5)
     
     def parallelProj(self):
         self.canvas2.delete('all')
@@ -652,7 +673,7 @@ class Application(tk.Frame):
 
         COPz = COP[2]
         F = fp
-        B = -bp
+        B = bp
 
         CW = ([(umax + umin)/2, (vmax + vmin)/2, 0])
         DOP = np.subtract(CW, COP)
@@ -695,6 +716,99 @@ class Application(tk.Frame):
                 tmpe.append(res)
             Hedges1.append(tmpe)
 
+        ViewVolumeV = cs.TVertexList() # view volume vertices
+        
+        v0 = cs.TVertex(-1, 1, F)         # vertex 0
+        v1 = cs.TVertex(1, 1, F)         # vertex 1
+        v2 = cs.TVertex(1, -1, F)         # vertex 2
+        v3 = cs.TVertex(-1, -1, F)         # vertex 3
+        v4 = cs.TVertex(-1, 1, -1)       # vertex 4
+        v5 = cs.TVertex(1, 1, -1)        # vertex 5
+        v6 = cs.TVertex(1, -1, -1)       # vertex 6
+        v7 = cs.TVertex(-1, -1, -1)      # vertex 7
+
+        ViewVolumeV.addVertex(v0)
+        ViewVolumeV.addVertex(v1)
+        ViewVolumeV.addVertex(v2)
+        ViewVolumeV.addVertex(v3)
+        ViewVolumeV.addVertex(v4)
+        ViewVolumeV.addVertex(v5)
+        ViewVolumeV.addVertex(v6)
+        ViewVolumeV.addVertex(v7)
+
+        ViewVolumeVList = ViewVolumeV.getVList()
+        ViewVolumeE = cs.TEdgeList() # view volume edges (clockwise based on the axis of the surface)
+        E0 = cs.TEdge(ViewVolumeVList[0], ViewVolumeVList[1])  # edge 0
+        E1 = cs.TEdge(ViewVolumeVList[1], ViewVolumeVList[2])  # edge 1
+        E2 = cs.TEdge(ViewVolumeVList[2], ViewVolumeVList[3])  # edge 2
+        E3 = cs.TEdge(ViewVolumeVList[3], ViewVolumeVList[0])  # edge 3
+
+        E4 = cs.TEdge(ViewVolumeVList[5], ViewVolumeVList[4])  # edge 4
+        E5 = cs.TEdge(ViewVolumeVList[4], ViewVolumeVList[7])  # edge 5
+        E6 = cs.TEdge(ViewVolumeVList[7], ViewVolumeVList[6])  # edge 6
+        E7 = cs.TEdge(ViewVolumeVList[6], ViewVolumeVList[4])  # edge 7
+
+        E8 = cs.TEdge(ViewVolumeVList[0], ViewVolumeVList[4])  # edge 8
+        E9 = cs.TEdge(ViewVolumeVList[5], ViewVolumeVList[1])  # edge 9
+        E10 = cs.TEdge(ViewVolumeVList[2], ViewVolumeVList[6])  # edge 10
+        E11 = cs.TEdge(ViewVolumeVList[7], ViewVolumeVList[3])  # edge 11
+
+        ViewVolumeE.addEdge(E0)
+        ViewVolumeE.addEdge(E1)
+        ViewVolumeE.addEdge(E2)
+        ViewVolumeE.addEdge(E3)
+        ViewVolumeE.addEdge(E4)
+        ViewVolumeE.addEdge(E5)
+        ViewVolumeE.addEdge(E6)
+        ViewVolumeE.addEdge(E7)
+        ViewVolumeE.addEdge(E8)
+        ViewVolumeE.addEdge(E9)
+        ViewVolumeE.addEdge(E10)
+        ViewVolumeE.addEdge(E11)
+
+        ViewVolumeEList = ViewVolumeE.getEList()
+        ViewVolumeS = cs.TSurfaceList() # view volume surfaces (clockwise based on the axis of the surface)
+        S0 = cs.TSurface(ViewVolumeEList[0], ViewVolumeEList[1], ViewVolumeEList[2], ViewVolumeEList[3])               # front
+        S1 = cs.TSurface(ViewVolumeEList[4], ViewVolumeEList[5], ViewVolumeEList[6], ViewVolumeEList[7])               # back
+        S2 = cs.TSurface((ViewVolumeVList[4], ViewVolumeVList[0]), (ViewVolumeVList[0], ViewVolumeVList[3]), (ViewVolumeVList[3], ViewVolumeVList[7]), (ViewVolumeVList[7], ViewVolumeVList[4]))   # left
+        S3 = cs.TSurface((ViewVolumeVList[1], ViewVolumeVList[5]), (ViewVolumeVList[5], ViewVolumeVList[6]), (ViewVolumeVList[6], ViewVolumeVList[2]), (ViewVolumeVList[2], ViewVolumeVList[1]))  # right
+        S4 = cs.TSurface((ViewVolumeVList[4], ViewVolumeVList[5]), ViewVolumeEList[9], (ViewVolumeVList[1], ViewVolumeVList[0]), ViewVolumeEList[8])   # top
+        S5 = cs.TSurface((ViewVolumeVList[3], ViewVolumeVList[2]), ViewVolumeEList[10], (ViewVolumeVList[6], ViewVolumeVList[7]), ViewVolumeEList[11])  # bottom
+        
+        ViewVolumeS.addEdge(S0)
+        ViewVolumeS.addEdge(S1)
+        ViewVolumeS.addEdge(S2)
+        ViewVolumeS.addEdge(S3)
+        ViewVolumeS.addEdge(S4)
+        ViewVolumeS.addEdge(S5)
+
+        ViewVolumeSList = ViewVolumeS.getSList()
+        surfaces = []
+
+        for s in ViewVolumeSList:
+            s = s.getSurface()
+            tmps = []
+            for e in s:
+                tmpe = []
+                if(isinstance(e, cs.TEdge)):
+                    e = e.getVertices()
+                else:
+                    pass
+                for v in e:
+                    v = v.getPoints()
+                    tmpe.append(v)
+                tmps.append(tmpe)
+            surfaces.append(tmps)
+
+        Hedges2 = []
+        for i, edge in enumerate(Hedges1):
+            # print(f'\nedge {i}')
+            res = cb.cyrusbeck3d(edge[0], edge[1], surfaces, debug=False, proj='parallel')
+            Hedges2.append(res)
+
+        # print(f'total edges before clipping: {len(Hedges1)}')
+        # print(f'total edges after clipping: {len(Hedges2)}')
+
         cwidth = self.canvas.winfo_width()
         cheight = self.canvas.winfo_height()
         coc = (cwidth / 2, cheight / 2)
@@ -723,28 +837,35 @@ class Application(tk.Frame):
         self.canvas2.create_line(w3[0], w3[1], w4[0], w4[1])
         self.canvas2.create_line(w4[0], w4[1], w1[0], w1[1])
 
-        Hedges2 = []
-        for e in Hedges1:
+        Hedges3 = []
+        for e in Hedges2:
             tmpe = []
-            for p in e:
-                p = list(p)
-                p[0] *= (wwidth / 2)
-                p[1] *= (wheight / 2) 
-                p[0] += coc[0]
-                p[1] += coc[1]
-                tmpe.append(p)
-            Hedges2.append(tmpe)
-        
-        for i, e in enumerate(reversed(Hedges2)):
-            p1 = e[0]
-            p2 = e[1]
-            # clip outside window
-            newP1P2 = cb.cyrusbeckv2(p1, p2, wvertices, wedges, debug=False)
-            p1, p2 = newP1P2   
-            if(i > self.draw):
-                self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
+            if(e is not None):
+                for p in e:
+                    p = list(p)
+                    p[0] *= (wwidth / 2)
+                    p[1] *= (wheight / 2) 
+                    p[0] += coc[0]
+                    p[1] += coc[1]
+                    tmpe.append(p)
             else:
-                self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1])
+                tmpe.append(None)
+            Hedges3.append(tmpe)
+        
+        for i, e in enumerate(reversed(Hedges3)):
+            if(e[0] is not None):
+                p1 = e[0]
+                p2 = e[1]
+                # clip outside window
+                res = cb.cyrusbeckv2(p1, p2, wedges, debug=False)
+                if(i > self.draw):
+                    if(res is not None):
+                        p1, p2 = res  
+                        self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1], fill='red', width=2.5)
+                else:
+                    if(res is not None):
+                        p1, p2 = res 
+                        self.canvas2.create_line(p1[0], p1[1], p2[0], p2[1])
 
     def refreshView(self):
 
