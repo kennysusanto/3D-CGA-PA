@@ -1,10 +1,13 @@
 # 3D-CGA-PA
 ## PA 5 : Perspective Projection
 
-This program is using python3, make sure you run the script using python3.
+This program is using python3.7
+
+Executable created using pyinstaller
 
 ### Development
 Make sure you have [Git](https://git-scm.com/) installed.
+
 Steps:
 1. Clone the repository using "git clone (http link)" to your desired folder.
 2. *Do "git pull" before updating the code.*
@@ -17,6 +20,6 @@ Steps:
 
 ### Running the program
 Steps:
-1. Download dist.rar in `/dist/dist.rar`
+1. Download ***dist.rar*** in `/dist/dist.rar`
 2. Extract to desired folder
 3. Run `main.py`
