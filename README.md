@@ -23,7 +23,7 @@ Make sure you have [Git](https://git-scm.com/) installed.
 
 Steps:
 1. Clone the repository using "git clone (http link)" to your desired folder.
-2. *Do "git pull" before updating the code.*
+2. Do `git pull` before updating the code.
 3. Edit the code
 4. Create new branch `git branch newbranch`
 5. Stage `git add .`
@@ -40,4 +40,4 @@ Libraries:
 ### Helpful
 Pyinstaller syntax: `pyinstaller main.py -F --noconsole`
 
-[Pyinstaller docs](https://pyinstaller.readthedocs.io/en/stable/usage.html)
+Pyinstaller docs: [link](https://pyinstaller.readthedocs.io/en/stable/usage.html)
