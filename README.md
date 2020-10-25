@@ -1,6 +1,11 @@
 # 3D-CGA-PA
 ## PA 5 : Perspective Projection
 
+Navbar: 
+[Running the program](https://github.com/kennysusanto/3D-CGA-PA#running-the-program)
+[Development](https://github.com/kennysusanto/3D-CGA-PA#development)
+[Helpful](https://github.com/kennysusanto/3D-CGA-PA#helpful)
+
 This program is created using python3.7
 
 Executable file created using pyinstaller
@@ -31,7 +36,6 @@ Libraries:
 4. pyinstaller
 
 ### Helpful
-Pyinstaller syntax:
-`pyinstaller main.py -F --noconsole`
+Pyinstaller syntax: `pyinstaller main.py -F --noconsole`
 
 [Pyinstaller docs](https://pyinstaller.readthedocs.io/en/stable/usage.html)
