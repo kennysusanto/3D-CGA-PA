@@ -12,6 +12,8 @@ This program is created using python3.7
 
 Executable file created using pyinstaller
 
+[PA 5 Report](http://bit.ly/3dcgaprogammingassignment05)
+
 ### Running the program
 Steps:
 1. Download [dist.rar](https://github.com/kennysusanto/3D-CGA-PA/blob/master/dist/dist.rar) in `/dist/dist.rar`
