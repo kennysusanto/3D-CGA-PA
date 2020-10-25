@@ -29,3 +29,9 @@ Libraries:
 2. numpy
 3. math
 4. pyinstaller
+
+### Helpful
+Pyinstaller syntax:
+`pyinstaller main.py -F --noconsole`
+
+[Pyinstaller docs](https://pyinstaller.readthedocs.io/en/stable/usage.html)
