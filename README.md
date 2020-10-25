@@ -16,7 +16,7 @@ Executable file created using pyinstaller
 Steps:
 1. Download [dist.rar](https://github.com/kennysusanto/3D-CGA-PA/blob/master/dist/dist.rar) in `/dist/dist.rar`
 2. Extract to desired folder
-3. Run `main.py`
+3. Run `main.exe`
 
 ### Development
 Make sure you have [Git](https://git-scm.com/) installed.
