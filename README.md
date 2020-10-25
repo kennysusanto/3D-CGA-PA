@@ -14,7 +14,7 @@ Executable file created using pyinstaller
 
 ### Running the program
 Steps:
-1. Download **dist.rar** in `/dist/dist.rar`
+1. Download [dist.rar](https://github.com/kennysusanto/3D-CGA-PA/blob/master/dist/dist.rar) in `/dist/dist.rar`
 2. Extract to desired folder
 3. Run `main.py`
 
