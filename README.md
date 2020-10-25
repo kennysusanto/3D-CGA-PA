@@ -29,7 +29,7 @@ Steps:
 5. Stage `git add .`
 6. Commit `git commit -m "message"`
 7. Push `git push`
-8. Request fork
+8. Send pull request
 
 Libraries:
 1. tk
