@@ -3,7 +3,9 @@
 
 Navbar: 
 [Running the program](https://github.com/kennysusanto/3D-CGA-PA#running-the-program)
+|
 [Development](https://github.com/kennysusanto/3D-CGA-PA#development)
+|
 [Helpful](https://github.com/kennysusanto/3D-CGA-PA#helpful)
 
 This program is created using python3.7
